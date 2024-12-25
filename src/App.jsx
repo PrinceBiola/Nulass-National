@@ -8,6 +8,8 @@ import Blog from './Pages/Blog/Blog'
 import About from './Pages/About/About'
 import Applications from './Pages/Apply/Apply'
 import Eventss from './Pages/Eventss/Eventss';
+import DashboardLayout from './Components/Dashboard/DashboardLayout'
+import Dashboard from './Components/Dashboard/Dashboard'
 
 
 function App() {
@@ -24,6 +26,7 @@ function App() {
       <Route path="/about" element={<About />} />
       <Route path="/apply" element={<Applications />} />
       <Route path="/events" element={<Eventss />} />
+      <Route path="/dashboard" element={<DashboardLayout><Dashboard /></DashboardLayout>} />
 
     </Routes>
       
