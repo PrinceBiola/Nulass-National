@@ -1,120 +1,100 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  FaHome, FaUsers, FaBlog, FaCalendarAlt, 
-  FaMoneyBillWave, FaChartBar, FaEnvelope, 
-  FaCog, FaDatabase, FaBell, FaSearch, FaUserCircle 
-} from 'react-icons/fa';
-
-import Logo from '../../assets/Images/Logo.png'
-
-function DashboardLayout({ children }) {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const location = useLocation();
-
-  const menuItems = [
-    { path: '/dashboard', icon: FaHome, label: 'Dashboard' },
-    { path: '/dashboard/users', icon: FaUsers, label: 'User Management' },
-    { path: '/dashboard/blog', icon: FaBlog, label: 'Blog Management' },
-    { path: '/dashboard/events', icon: FaCalendarAlt, label: 'Events' },
-    { path: '/dashboard/finance', icon: FaMoneyBillWave, label: 'Financials' },
-    { path: '/dashboard/analytics', icon: FaChartBar, label: 'Analytics' },
-    { path: '/dashboard/messages', icon: FaEnvelope, label: 'Communication' },
-    { path: '/dashboard/settings', icon: FaCog, label: 'Settings' },
-    { path: '/dashboard/backup', icon: FaDatabase, label: 'Backup' },
-  ];
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-40 h-screen transition-transform ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } bg-white border-r border-gray-200 w-64`}>
-        {/* Logo */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <Link to="/dashboard" className="flex items-center space-x-3">
-            <img src={Logo} alt="NULASS Logo" className="h-8 w-8" />
-            <span className="text-xl font-semibold">NULASS Admin</span>
-          </Link>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden">
-            <FaCog className="w-5 h-5" />
-          </button>
+// ... existing code ...
+      <div className="space-y-6">
+        {/* User Management Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">User Management</h2>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>View Members: List of all registered members with filters (e.g., active/inactive, location).</li>
+            <li>Search and sort by name, school, or registration date.</li>
+            <li>Approve/Reject New Members: Notifications for pending member registrations.</li>
+            <li>Approve or reject applications.</li>
+            <li>Role Assignment: Assign roles such as Admin, Editor, or Member.</li>
+            <li>Edit/Delete Users: Modify user details or remove users.</li>
+          </ul>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="p-4 space-y-2">
-          {menuItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
-                location.pathname === item.path
-                  ? 'bg-customGreen text-white'
-                  : 'hover:bg-gray-100'
-              }`}
-            >
-              <item.icon className="w-5 h-5" />
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </nav>
-      </aside>
+        {/* Content Management Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">Content Management</h2>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Blog Management: Create, edit, delete blog posts.</li>
+            <li>Manage categories and tags.</li>
+            <li>View drafts and scheduled posts.</li>
+            <li>Gallery Management: Upload and organize images/videos into albums.</li>
+            <li>Add captions and tags to media.</li>
+          </ul>
+        </div>
 
-      {/* Main Content */}
-      <div className={`${isSidebarOpen ? 'lg:ml-64' : ''}`}>
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between p-4">
-            <button
-              onClick={() => setSidebarOpen(!isSidebarOpen)}
-              className="lg:hidden"
-            >
-              <FaCog className="w-5 h-5" />
-            </button>
+        {/* Events Management Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">Events Management</h2>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Create New Events: Add event title, date, time, location, and description.</li>
+            <li>Upload banners or promotional images.</li>
+            <li>View Upcoming Events: List of all scheduled events with edit/delete options.</li>
+            <li>Event Registration Management: View and manage attendee lists.</li>
+            <li>Approve/decline registrations.</li>
+          </ul>
+        </div>
 
-            <div className="flex justify-between items-center w-full">
-              {/* Search */}
-              <div className="hidden md:flex items-center">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="w-64 pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-customGreen"
-                  />
-                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                </div>
-              </div>
+        {/* Financial and Scholarship Management Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">Financial and Scholarship Management</h2>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Financial Reports: View and manage budgets, donations, and expenses.</li>
+            <li>Generate financial summaries.</li>
+            <li>Scholarship Applications: Review submitted applications.</li>
+            <li>Approve/reject and notify applicants.</li>
+          </ul>
+        </div>
 
-              {/* Notifications and Profile */}
-              <div className="flex items-center space-x-4">
-                {/* Notifications */}
-                <button className="relative p-2 hover:bg-gray-100 rounded-lg">
-                  <FaBell className="w-5 h-5" />
-                  <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-                    3
-                  </span>
-                </button>
+        {/* Analytics and Reports Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">Analytics and Reports</h2>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Website Traffic: Metrics like page views, bounce rate, and user demographics.</li>
+            <li>Member Engagement: Track member logins and interactions.</li>
+            <li>Event Metrics: Number of attendees, feedback ratings, etc.</li>
+          </ul>
+        </div>
 
-                {/* Profile */}
-                <div className="flex items-center space-x-3">
-                  <FaUserCircle className="w-8 h-8" />
-                  <div className="hidden md:block">
-                    <p className="text-sm font-semibold">Admin User</p>
-                    <p className="text-xs text-gray-500">admin@nulass.org</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
+        {/* Communication Tools Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">Communication Tools</h2>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Send Notifications: Announcements to all members or specific groups.</li>
+            <li>Email or SMS options.</li>
+            <li>Feedback & Support: Manage and respond to user inquiries and complaints.</li>
+          </ul>
+        </div>
 
-        {/* Page Content */}
-        <main className="p-4 md:p-6 lg:p-8">
-          {children}
-        </main>
+        {/* Settings Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">Settings</h2>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Website Settings: Manage website logo, title, and footer details.</li>
+            <li>Theme Customization: Change colors, fonts, and layouts.</li>
+            <li>Security Settings: Manage passwords, two-factor authentication, and access permissions.</li>
+          </ul>
+        </div>
+
+        {/* Task Management Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">Task Management</h2>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Admin Tasks: Assign and track admin responsibilities.</li>
+            <li>Set deadlines and priorities.</li>
+            <li>Notifications: Alerts for pending tasks like blog approvals or member verifications.</li>
+          </ul>
+        </div>
+
+        {/* Backup and Maintenance Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">Backup and Maintenance</h2>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Backup Data: Download or schedule backups for member lists, blogs, and financial data.</li>
+            <li>Maintenance Mode: Activate maintenance mode during website updates.</li>
+          </ul>
+        </div>
       </div>
-    </div>
-  );
-}
-
-export default DashboardLayout; 
+// ... existing code ...
