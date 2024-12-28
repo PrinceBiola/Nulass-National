@@ -57,6 +57,9 @@ function Nav() {
         <Link to="/apply">
           <li className="hover:text-customGreen transition-colors">Applications</li>
         </Link>
+        <Link to="/dashboard">
+          <li className="hover:text-customGreen transition-colors">Dashboard</li>
+        </Link>
         <div className="flex items-center gap-2 xl:gap-4">
           <Link to="/login">
             <button className="text-customGreen border-2 border-customGreen px-4 xl:px-6 py-1.5 xl:py-2 rounded-lg hover:bg-customGreen hover:text-white transition-all text-sm xl:text-base">
