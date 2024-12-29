@@ -109,6 +109,11 @@ function Nav() {
                 Applications
               </li>
             </Link>
+            <Link to="/dashboard" onClick={toggleMenu} className="w-full">
+              <li className="px-4 py-2 hover:bg-gray-100 hover:text-customGreen transition-all">
+                DashBoard
+              </li>
+            </Link>
             <div className="flex flex-col gap-2 w-full p-4 pt-2 border-t mt-1">
               <Link to="/login" onClick={toggleMenu} className="w-full">
                 <button className="w-full text-customGreen border-2 border-customGreen py-2 rounded-lg hover:bg-customGreen hover:text-white transition-all text-sm sm:text-base">
