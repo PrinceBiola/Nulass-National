@@ -2,13 +2,17 @@ import React, { useState } from "react";
 import Logo from "../../assets/Images/Logo.png";
 import { Link } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
+// import { UserContext } from "../../Context/UserContext";
 
-function Nav() {
+function Nav({ surname }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+  
+  // const { surname } = useContext(UserContext);
+  console.log("Current surname:", surname);
 
   return (
     <div className="fixed top-0 left-0 w-full bg-white px-4 sm:px-6 md:px-8 lg:px-12 xl:px-24 py-3 md:py-4 flex items-center justify-between shadow-md z-50">
@@ -61,16 +65,22 @@ function Nav() {
           <li className="hover:text-customGreen transition-colors">Dashboard</li>
         </Link>
         <div className="flex items-center gap-2 xl:gap-4">
-          <Link to="/login">
-            <button className="text-customGreen border-2 border-customGreen px-4 xl:px-6 py-1.5 xl:py-2 rounded-lg hover:bg-customGreen hover:text-white transition-all text-sm xl:text-base">
-              Login
-            </button>
-          </Link>
-          <Link to="/signup">
-            <button className="bg-customGreen text-white px-4 xl:px-6 py-1.5 xl:py-2 rounded-lg hover:bg-opacity-90 transition-all text-sm xl:text-base">
-              Sign Up
-            </button>
-          </Link>
+          {surname ? (
+            <span className="text-customGreen font-semibold">{surname}</span>
+          ) : (
+            <>
+              <Link to="/login">
+                <button className="text-customGreen border-2 border-customGreen px-4 xl:px-6 py-1.5 xl:py-2 rounded-lg hover:bg-customGreen hover:text-white transition-all text-sm xl:text-base">
+                  Login
+                </button>
+              </Link>
+              <Link to="/signup">
+                <button className="bg-customGreen text-white px-4 xl:px-6 py-1.5 xl:py-2 rounded-lg hover:bg-opacity-90 transition-all text-sm xl:text-base">
+                  Sign Up
+                </button>
+              </Link>
+            </>
+          )}
         </div>
       </ul>
 
@@ -98,7 +108,6 @@ function Nav() {
                 Events
               </li>
             </Link>
-            
             <Link to="/contact" onClick={toggleMenu} className="w-full">
               <li className="px-4 py-2 hover:bg-gray-100 hover:text-customGreen transition-all">
                 Contact
@@ -111,7 +120,7 @@ function Nav() {
             </Link>
             <Link to="/dashboard" onClick={toggleMenu} className="w-full">
               <li className="px-4 py-2 hover:bg-gray-100 hover:text-customGreen transition-all">
-                DashBoard
+                Dashboard
               </li>
             </Link>
             <div className="flex flex-col gap-2 w-full p-4 pt-2 border-t mt-1">

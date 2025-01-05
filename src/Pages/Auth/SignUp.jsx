@@ -1,12 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import NavWrapper from "../../Components/NavWrapper";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from '../../api/auth';
 
-export default function SignUp() {
+export default function SignUp({ onSignUp }) {
   const [showPassword, setShowPassword] = useState(false);
+  const [surname, setSurname] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const navigate = useNavigate();
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await registerUser({ surname, name, email, password });
+      setSuccess('Registration successful! Please log in.');
+      onSignUp(response.data.surname);
+      navigate('/login');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed');
+    }
   };
 
   return (
@@ -15,37 +39,58 @@ export default function SignUp() {
         <div className="shadow-xl shadow-gray-500 p-4 md:p-8 text-slate-800 w-full max-w-[500px] text-center flex flex-col gap-6 md:gap-8 rounded-xl animate-slideIn">
           <h1 className="font-bold text-3xl md:text-5xl">Sign Up</h1>
 
-          <form action="" className="flex flex-col gap-4 md:gap-6">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 md:gap-6">
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {success && <p style={{ color: 'green' }}>{success}</p>}
             <div className="flex flex-col text-base md:text-lg font-semibold text-start">
-              <label htmlFor="name">Full Name</label>
+              <label htmlFor="surname">Surname</label>
               <input
                 type="text"
-                name="text"
-                id="text"
-                placeholder="Enter Your Full Name"
+                name="surname"
+                id="surname"
+                placeholder="Enter Your Surname"
                 className="border px-3 md:px-4 py-2 rounded-lg w-full font-medium text-sm md:text-base focus:ring-customGreen focus:ring-2 focus:outline-none"
+                value={surname}
+                onChange={(e) => setSurname(e.target.value)}
                 required
               />
             </div>
             <div className="flex flex-col text-base md:text-lg font-semibold text-start">
-              <label htmlFor="Email">Email</label>
+              <label htmlFor="name">Other Names</label>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                placeholder="Enter Your Other Names"
+                className="border px-3 md:px-4 py-2 rounded-lg w-full font-medium text-sm md:text-base focus:ring-customGreen focus:ring-2 focus:outline-none"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="flex flex-col text-base md:text-lg font-semibold text-start">
+              <label htmlFor="email">Email</label>
               <input
                 type="email"
                 name="email"
                 id="email"
                 placeholder="Enter Your Email"
                 className="border px-3 md:px-4 py-2 rounded-lg w-full font-medium focus:ring-customGreen focus:ring-2 focus:outline-none text-sm md:text-base"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
             <div className="flex flex-col text-base md:text-lg font-semibold text-start">
-              <label htmlFor="Password">Password</label>
+              <label htmlFor="password">Password</label>
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
                 placeholder="Create Your Password"
                 className="border px-3 md:px-4 py-2 rounded-lg focus:ring-customGreen focus:ring-2 focus:outline-none w-full text-sm md:text-base font-medium"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
@@ -72,11 +117,11 @@ export default function SignUp() {
                 Show Password
               </label>
             </div>
-          </form>
 
-          <button className="bg-customGreen w-full py-2.5 md:py-3 font-semibold text-lg md:text-xl rounded-lg text-white">
-            Sign Up
-          </button>
+            <button type="submit" className="bg-customGreen w-full py-2.5 md:py-3 font-semibold text-lg md:text-xl rounded-lg text-white">
+              Sign Up
+            </button>
+          </form>
 
           <p className="font-semibold text-base md:text-lg">
             Already have an account?{" "}
