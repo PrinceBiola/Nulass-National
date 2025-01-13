@@ -17,10 +17,15 @@
  import Analytics from "./Pages/Analytics/Analytics";
  import Communication from "./Pages/Communication/Communication";
  import Settings from "./Pages/Settings/Settings";
-//  import TaskManagement from "./Pages/TaskManagement/TaskManagement";
  import BackupAndMaintenance from "./Pages/BackupAndMaintenance/BackupAndMaintenance";
-//  import Nav from "./Components/Nav/Nav";
-//  import { UserProvider } from "./Context/UserContext";
+import InstitutionDashboard from "./Pages/InstitutionDashboard/InstitutionDashboard";
+import InstitutionDashboardLayout from "./Pages/InstitutionDashboard/InstitutionDashboardLayout";
+import MembersManagement from "./Pages/MembersManagement/MembersManagement";
+import Insti_Communication from "./Pages/Communication/Insti_Communication";
+import Insti_Finance from "./Pages/Financials/Insti_Finance";
+import Insti_Analytics from "./Pages/Analytics/Insti_Analytics";
+// import InstiEvent from "./Pages/InstiEvent/InstiEvent";
+
 
  function App() {
    return (
@@ -100,7 +105,7 @@
                </DashboardLayout>
              }
            />
-           {/* <Route path="/dashboard/taskmanagemnt" element={<DashboardLayout><TaskManagement /></DashboardLayout>} /> */}
+           
            <Route
              path="/dashboard/backup"
              element={
@@ -109,6 +114,55 @@
                </DashboardLayout>
              }
            />
+           
+           <Route
+             path="/institution-dashboard"
+             element={
+               <InstitutionDashboardLayout>
+                 <InstitutionDashboard />
+               </InstitutionDashboardLayout>
+             }
+           />
+           <Route
+             path="/institution-dashboard/members"
+             element={
+               <InstitutionDashboardLayout>
+                 <MembersManagement />
+               </InstitutionDashboardLayout>
+             }
+           />
+           <Route
+             path="/institution-dashboard/communication"
+             element={
+               <InstitutionDashboardLayout>
+                 <Insti_Communication />
+               </InstitutionDashboardLayout>
+             }
+           />
+           <Route
+             path="/institution-dashboard/finance"
+             element={
+               <InstitutionDashboardLayout>
+                 <Insti_Finance />
+               </InstitutionDashboardLayout>
+             }
+           />
+           <Route
+             path="/institution-dashboard/analytics"
+             element={
+               <InstitutionDashboardLayout>
+                 <Insti_Analytics />
+               </InstitutionDashboardLayout>
+             }
+           />
+           {/* <Route
+             path="/institution-dashboard/events"
+             element={
+               <InstitutionDashboardLayout>
+                 <InstiEvent />
+               </InstitutionDashboardLayout>
+             }
+           /> */}
          </Routes>
        </BrowserRouter>
      </>

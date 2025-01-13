@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import { fetchEvents, createEvent, deleteEvent } from '../../api/event'; 
 function Events() {
-  const [events, setEvents] = useState([]); // Replace with actual data fetching
+  const [events, setEvents] = useState([]);
   const [newEvent, setNewEvent] = useState({
     title: '',
     date: '',
@@ -13,16 +13,36 @@ function Events() {
 
   const [attendees, setAttendees] = useState([]); // Replace with actual data fetching
 
-  // Example functions to handle event actions
-  const createEvent = () => {
-    // Logic to create a new event
-    setEvents([...events, newEvent]);
-    setNewEvent({ title: '', date: '', time: '', location: '', description: '', banner: '' }); // Reset form
+  // Fetch events when the component mounts
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const fetchedEvents = await fetchEvents();
+        setEvents(fetchedEvents);
+      } catch (error) {
+        console.error('Failed to fetch events:', error);
+      }
+    };
+    loadEvents();
+  }, []);
+
+  const createNewEvent = async () => {
+    try {
+      const createdEvent = await createEvent(newEvent);
+      setEvents([...events, createdEvent]);
+      setNewEvent({ title: '', date: '', time: '', location: '', description: '', banner: '' }); // Reset form
+    } catch (error) {
+      console.error('Failed to create event:', error);
+    }
   };
 
-  const deleteEvent = (index) => {
-    // Logic to delete an event
-    setEvents(events.filter((_, i) => i !== index));
+  const deleteEventById = async (eventId) => {
+    try {
+      await deleteEvent(eventId);
+      setEvents(events.filter(event => event._id !== eventId)); // Update state to remove deleted event
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
   };
 
   const approveRegistration = (id) => {
@@ -77,15 +97,15 @@ function Events() {
           value={newEvent.banner}
           onChange={(e) => setNewEvent({ ...newEvent, banner: e.target.value })}
         />
-        <button onClick={createEvent} className="bg-blue-600 text-white rounded-lg p-2">Create Event</button>
+        <button onClick={createNewEvent} className="bg-blue-600 text-white rounded-lg p-2">Create Event</button>
       </div>
 
       {/* View Upcoming Events Section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold mb-4">Upcoming Events</h2>
         <ul className="space-y-2">
-          {events.map((event, index) => (
-            <li key={index} className="flex justify-between items-center bg-gray-50 p-4 rounded-lg">
+          {events.map((event) => (
+            <li key={event._id} className="flex justify-between items-center bg-gray-50 p-4 rounded-lg">
               <div>
                 <h4 className="font-bold">{event.title}</h4>
                 <p>{event.date} at {event.time}</p>
@@ -94,7 +114,7 @@ function Events() {
                 {event.banner && <img src={event.banner} alt="Event Banner" className="w-32 h-32 object-cover mt-2" />}
               </div>
               <div>
-                <button onClick={() => deleteEvent(index)} className="text-red-600">Delete</button>
+                <button onClick={() => deleteEventById(event._id)} className="text-red-600">Delete</button>
               </div>
             </li>
           ))}
