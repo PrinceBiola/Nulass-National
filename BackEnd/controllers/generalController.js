@@ -11,6 +11,7 @@ router.post('/blogs', async (req, res) => {
             description: req.body.description,
             category: req.body.category,
             postTime: req.body.postTime,
+            image: req.body.image,
             author: req.body.author,
             createdAt: req.body.createdAt,
             comments: [], 
@@ -21,6 +22,7 @@ router.post('/blogs', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
 
 
 
@@ -66,10 +68,6 @@ router.delete('/blogs/:id', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-
-
-
-//  this is for blog 
 
 
 // event routes
@@ -124,6 +122,7 @@ router.post('/events', async (req, res) => {
             date: req.body.date,
             location: req.body.location,
             createdAt: req.body.createdAt,
+            image: req.body.image,
             author: req.body.author,
         });
         await event.save();
@@ -141,10 +140,6 @@ router.get('/events', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-
-
-
-
 
 
 

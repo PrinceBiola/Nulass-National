@@ -25,6 +25,10 @@ const eventSchema = new moogose.Schema({
         type: String,
         required: true,
     },
+    image:{
+        type: String,
+        required: true,
+    }
 });
 
 module.exports = moogose.model('Event', eventSchema);
