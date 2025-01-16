@@ -9,6 +9,7 @@ function BlogManagement() {
     category: "",
     postTime: "",
     author: "",
+    image:"",
     createdAt: new Date(),
   });
   const [error, setError] = useState("");
@@ -38,8 +39,9 @@ function BlogManagement() {
         title: "",
         description: "",
         category: "",
-        postTime: "",
+        postTime: new Date(),
         author: "",
+        image: "",
         createdAt: new Date(),
       }); // Reset form
       setSuccess("Post created successfully!");
@@ -57,7 +59,6 @@ function BlogManagement() {
       setError("Failed to delete post.");
     }
   };
-
 
   return (
     <div className="space-y-8">
@@ -103,7 +104,15 @@ function BlogManagement() {
             required
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-customGreen focus:outline-none"
           />
-          <input type="file" required className="block w-1/4 text-gray-500" />
+          <input
+            type="text"
+            value={newPost.image}
+            onChange={(e) =>
+              setNewPost({ ...newPost, image: e.target.value })
+            }
+            required
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-customGreen focus:outline-none"
+          />
 
           <div className="flex space-x-4">
             <button
@@ -180,7 +189,6 @@ function BlogManagement() {
     </div>
   );
 
- 
   // return (
   //   <div className="space-y-5">
   //     <div className="bg-white p-7 rounded-lg">

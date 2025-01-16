@@ -20,7 +20,7 @@ function Events() {
         const fetchedEvents = await fetchEvents();
         setEvents(fetchedEvents);
       } catch (error) {
-        console.error('Failed to fetch events:', error);
+        console.error('Failed to fetch events:', error);  
       }
     };
     loadEvents();

@@ -1,53 +1,71 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import NavWrapper from "../../Components/NavWrapper";
 import { FaArrowRight, FaClock, FaFire, FaTag, FaSearch } from "react-icons/fa";
 import { FaCalendarWeek, FaPerson } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import Blog1 from "../../assets/Images/Blog1.jpeg";
+import { fetchPosts } from "../../api/blog";
 
 export default function Blog() {
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [posts, setPosts] = useState([]);
 
-  const categories = [
-    { id: 'all', name: 'All Posts' },
-    { id: 'news', name: 'News & Announcements' },
-    { id: 'spotlights', name: 'Student Spotlights' },
-    { id: 'events', name: 'Events Highlights' },
-    { id: 'academic', name: 'Academic Tips' },
-    { id: 'culture', name: 'Cultural Heritage' }
-  ];
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        const fetchedPosts = await fetchPosts();
+        setPosts(fetchedPosts);
+      } catch (error) {
+        setError("Failed to fetch posts.");
+      }
+    };
+    loadPosts();
+  }, []);
 
-  const featuredPost = {
-    title: "Celebrating Lagos Heritage: Highlights from NULASS National Day 2023",
-    excerpt: "Discover the rich culture and unity displayed at this year's celebration, featuring traditional performances, academic achievements, and community building initiatives.",
-    image: Blog1,
-    date: "December 15, 2023",
-    author: "NULASS Media Team",
-    category: "Events Highlights",
-    readTime: "5 min read"
-  };
+  const categories = ["all", ...new Set(posts.map((post) => post.category))];
 
-  const recentPosts = [
-    {
-      title: "How NULASS Supports Lagos State Students Nationwide",
-      excerpt: "Learn about the programs and initiatives that help Lagos State students thrive academically and socially.",
-      image: Blog1,
-      date: "December 10, 2023",
-      author: "Admin",
-      category: "News",
-      readTime: "4 min read"
-    },
-    {
-      title: "Top 5 Cultural Festivals Every Lagos Student Should Experience",
-      excerpt: "Celebrate the vibrant traditions of Lagos with these must-see festivals that showcase our rich heritage.",
-      image: Blog1,
-      date: "December 5, 2023",
-      author: "Cultural Team",
-      category: "Culture",
-      readTime: "3 min read"
-    }
-    // Add more posts as needed
-  ];
+  const Filteredpost  = activeCategory === "all" ? posts : posts.filter(post => post.category === activeCategory)
+
+  // const categories = [
+  //   { id: 'all', name: 'All Posts' },
+  //   { id: 'news', name: 'News & Announcements' },
+  //   { id: 'spotlights', name: 'Student Spotlights' },
+  //   { id: 'events', name: 'Events Highlights' },
+  //   { id: 'academic', name: 'Academic Tips' },
+  //   { id: 'culture', name: 'Cultural Heritage' }
+  // ];
+
+  // const featuredPost = {
+  //   title: "Celebrating Lagos Heritage: Highlights from NULASS National Day 2023",
+  //   excerpt: "Discover the rich culture and unity displayed at this year's celebration, featuring traditional performances, academic achievements, and community building initiatives.",
+  //   image: Blog1,
+  //   date: "December 15, 2023",
+  //   author: "NULASS Media Team",
+  //   category: "Events Highlights",
+  //   readTime: "5 min read"
+  // };
+
+  // const recentPosts = [
+  //   {
+  //     title: "How NULASS Supports Lagos State Students Nationwide",
+  //     excerpt: "Learn about the programs and initiatives that help Lagos State students thrive academically and socially.",
+  //     image: Blog1,
+  //     date: "December 10, 2023",
+  //     author: "Admin",
+  //     category: "News",
+  //     readTime: "4 min read"
+  //   },
+  //   {
+  //     title: "Top 5 Cultural Festivals Every Lagos Student Should Experience",
+  //     excerpt: "Celebrate the vibrant traditions of Lagos with these must-see festivals that showcase our rich heritage.",
+  //     image: Blog1,
+  //     date: "December 5, 2023",
+  //     author: "Cultural Team",
+  //     category: "Culture",
+  //     readTime: "3 min read"
+  //   }
+  //   // Add more posts as needed
+  // ];
 
   return (
     <NavWrapper>
@@ -56,7 +74,8 @@ export default function Blog() {
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">NULASS Blog</h1>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Stay updated with the latest news, events, and stories from the NULASS community.
+            Stay updated with the latest news, events, and stories from the
+            NULASS community.
           </p>
         </div>
 
@@ -82,17 +101,17 @@ export default function Blog() {
                   <h2 className="text-xl font-semibold">Categories</h2>
                 </div>
                 <div className="space-y-2">
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <button
-                      key={category.id}
-                      onClick={() => setActiveCategory(category.id)}
+                      key={category}
+                      onClick={() => setActiveCategory(category)}
                       className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
-                        activeCategory === category.id
-                          ? 'bg-customGreen text-white'
-                          : 'hover:bg-gray-100'
+                        activeCategory === category
+                          ? "bg-customGreen text-white"
+                          : "bg-transparent text-black"
                       }`}
                     >
-                      {category.name}
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
                     </button>
                   ))}
                 </div>
@@ -103,7 +122,7 @@ export default function Blog() {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Featured Post */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+            {/* <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
               <div className="md:flex">
                 <div className="md:w-1/2">
                   <img
@@ -129,12 +148,15 @@ export default function Blog() {
                   </Link>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Recent Posts Grid */}
             <div className="grid md:grid-cols-2 gap-8">
-              {recentPosts.map((post, index) => (
-                <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              {Filteredpost.map((post, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                >
                   <img
                     src={post.image}
                     alt={post.title}
@@ -143,10 +165,14 @@ export default function Blog() {
                   <div className="p-6">
                     <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                       <FaCalendarWeek />
-                      <span>{post.date}</span>
+                      <span>
+                        {new Date(post.createdAt).toLocaleDateString()}
+                      </span>
                       <span>•</span>
                       <FaClock />
-                      <span>{post.readTime}</span>
+                      <span>
+                        {new Date(post.postTime).toLocaleTimeString()}
+                      </span>
                     </div>
                     <h3 className="text-xl font-bold mb-3 hover:text-customGreen transition-colors">
                       {post.title}
@@ -156,7 +182,10 @@ export default function Blog() {
                       <span className="text-sm text-customGreen bg-green-50 px-3 py-1 rounded-full">
                         {post.category}
                       </span>
-                      <Link to={`/blog/post-slug-${index}`} className="inline-flex items-center gap-2 text-customGreen font-semibold hover:gap-3 transition-all">
+                      <Link
+                        to={`/blog/${post._id}`}
+                        className="inline-flex items-center gap-2 text-customGreen font-semibold hover:gap-3 transition-all"
+                      >
                         Read More <FaArrowRight />
                       </Link>
                     </div>
