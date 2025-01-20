@@ -12,6 +12,7 @@ function Member() {
       description: "Access scholarships, grants, and educational resources to support your academic journey."
     },
     {
+      
       icon: <FaHandshake className="w-6 h-6" />,
       title: "Networking",
       description: "Connect with fellow students, alumni, and industry professionals across Nigeria."

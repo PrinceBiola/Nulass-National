@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import NavWrapper from "../../Components/NavWrapper";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from '../../api/auth';
+import { AuthContext } from '../../context/AuthContext';
 
-export default function Login({ onLogin }) {
+export default function Login() {
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,8 +20,8 @@ export default function Login({ onLogin }) {
 
     try {
       const response = await loginUser({ email, password });
+      login(response.data.user);
       setSuccess('Login successful!');
-      onLogin(response.data.user.surname);
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
@@ -71,6 +73,11 @@ export default function Login({ onLogin }) {
             Don't have an account?{" "}
             <Link to="/signup">
               <span className="text-customGreen ">Sign Up</span>
+            </Link>
+          </p>
+          <p className="font-semibold text-base md:text-lg">
+            <Link to="/forgot-password">
+              <span className="text-customGreen ">Forgot Password?</span>
             </Link>
           </p>
         </div>

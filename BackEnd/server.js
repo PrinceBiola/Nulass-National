@@ -16,9 +16,9 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Routes
-app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api', require('./controllers/generalController'));
+app.use('/api/auth', require('./controllers/authController'));
+
 
 // Start server
 const PORT = process.env.PORT || 5000;

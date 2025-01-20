@@ -6,15 +6,18 @@ import { Link } from "react-router-dom";
 import Blog1 from "../../assets/Images/Blog1.jpeg";
 import { fetchPosts } from "../../api/blog";
 
+
 export default function Blog() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [posts, setPosts] = useState([]);
+  const [error, setError ] = useState("");
 
   useEffect(() => {
     const loadPosts = async () => {
       try {
         const fetchedPosts = await fetchPosts();
         setPosts(fetchedPosts);
+        console.log("post",fetchedPosts )
       } catch (error) {
         setError("Failed to fetch posts.");
       }

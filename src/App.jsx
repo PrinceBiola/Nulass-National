@@ -24,21 +24,28 @@ import MembersManagement from "./Pages/MembersManagement/MembersManagement";
 import Insti_Communication from "./Pages/Communication/Insti_Communication";
 import Insti_Finance from "./Pages/Financials/Insti_Finance";
 import Insti_Analytics from "./Pages/Analytics/Insti_Analytics";
+import ResetPassword from "./Pages/Auth/ResetPassword";
+import { AuthProvider } from "./context/AuthContext";
+import ForgotPassword from "./Pages/Auth/ForgotPassword";
 // import InstiEvent from "./Pages/InstiEvent/InstiEvent";
 
 
  function App() {
    return (
      <>
+     <AuthProvider>
        <BrowserRouter>
+
          {/* <Nav /> */}
          <Routes>
            <Route path="/" element={<Home />} />
            <Route path="/login" element={<Login />} />
            <Route path="/signup" element={<SignUp />} />
+           <Route path="//forgot-password" element={<ForgotPassword />} />
            <Route path="/contact" element={<Contact />} />
            <Route path="/blog" element={<Blog />} />
            <Route path="/about" element={<About />} />
+           <Route path="/reset-password" element={<ResetPassword />} />
            <Route path="/apply" element={<Applications />} />
            <Route path="/events" element={<Eventss />} />
            <Route
@@ -165,43 +172,12 @@ import Insti_Analytics from "./Pages/Analytics/Insti_Analytics";
            /> */}
          </Routes>
        </BrowserRouter>
+       </AuthProvider>
      </>
    );
  }
 
+ 
  export default App;
 
-// import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-// import './App.css';
-// import Home from './Pages/Home/Home';
-// import Login from './Pages/Auth/Login';
-// import SignUp from './Pages/Auth/SignUp';
-// import Nav from './Components/Nav/Nav';
-// import { useState } from 'react';
-
-// function App() {
-//   const [surname, setSurname] = useState(''); // State to hold the surname
-
-//   // Function to handle successful login or signup
-//   const handleLogin = (userSurname) => {
-//     setSurname(userSurname); // Set the surname when the user logs in
-//   };
-
-//   const handleSignUp = (userSurname) => {
-//     setSurname(userSurname); // Set the surname when the user signs up
-//   };
-
-//   return (
-//     <Router>
-//       <Nav surname={surname} /> {/* Pass the surname prop to Nav */}
-//       <Routes>
-//         <Route path="/" element={<Home />} />
-//         <Route path="/login" element={<Login onLogin={handleLogin} />} />
-//         <Route path="/signup" element={<SignUp onSignUp={handleSignUp} />} />
-//         {/* Add other routes as needed */}
-//       </Routes>
-//     </Router>
-//   );
-// }
-
-// export default App;
+ 
