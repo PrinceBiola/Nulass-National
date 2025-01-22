@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { fetchEvents, createEvent, deleteEvent } from '../../api/event'; 
+import { fetchEvents, createEvent, deleteEvent } from '../../api/event';
+import { formatDate } from '../../Helper/helper';
+
 function Events() {
   const [events, setEvents] = useState([]);
   const [newEvent, setNewEvent] = useState({
@@ -8,19 +10,22 @@ function Events() {
     time: '',
     location: '',
     description: '',
-    banner: '',
+    image: '',
+    author: "",
   });
+  
+  const [showForm, setShowForm] = useState(false);
+  const [expandedEvent, setExpandedEvent] = useState(null);
 
-  const [attendees, setAttendees] = useState([]); // Replace with actual data fetching
+  const [attendees, setAttendees] = useState([]);
 
-  // Fetch events when the component mounts
   useEffect(() => {
     const loadEvents = async () => {
       try {
         const fetchedEvents = await fetchEvents();
         setEvents(fetchedEvents);
       } catch (error) {
-        console.error('Failed to fetch events:', error);  
+        console.error('Failed to fetch events:', error);
       }
     };
     loadEvents();
@@ -30,7 +35,8 @@ function Events() {
     try {
       const createdEvent = await createEvent(newEvent);
       setEvents([...events, createdEvent]);
-      setNewEvent({ title: '', date: '', time: '', location: '', description: '', banner: '' }); // Reset form
+      setNewEvent({ title: '', date: '', time: '', location: '', description: '', image: '', author: "" });
+      setShowForm(false);  // Hide form after creating event
     } catch (error) {
       console.error('Failed to create event:', error);
     }
@@ -39,98 +45,113 @@ function Events() {
   const deleteEventById = async (eventId) => {
     try {
       await deleteEvent(eventId);
-      setEvents(events.filter(event => event._id !== eventId)); // Update state to remove deleted event
+      setEvents(events.filter(event => event._id !== eventId));
     } catch (error) {
       console.error('Failed to delete event:', error);
     }
   };
 
-  const approveRegistration = (id) => {
-    // Logic to approve registration
-  };
-
-  const declineRegistration = (id) => {
-    // Logic to decline registration
+  const toggleDescription = (eventId) => {
+    setExpandedEvent(expandedEvent === eventId ? null : eventId); 
   };
 
   return (
-    <div className="space-y-6">
-      {/* Create New Event Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold mb-4">Create New Event</h2>
-        <input
-          type="text"
-          placeholder="Event Title"
-          className="border rounded-lg p-2 w-full mb-2"
-          value={newEvent.title}
-          onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-        />
-        <input
-          type="date"
-          className="border rounded-lg p-2 w-full mb-2"
-          value={newEvent.date}
-          onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-        />
-        <input
-          type="time"
-          className="border rounded-lg p-2 w-full mb-2"
-          value={newEvent.time}
-          onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Location"
-          className="border rounded-lg p-2 w-full mb-2"
-          value={newEvent.location}
-          onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-        />
-        <textarea
-          placeholder="Description"
-          className="border rounded-lg p-2 w-full mb-2"
-          value={newEvent.description}
-          onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Banner URL"
-          className="border rounded-lg p-2 w-full mb-2"
-          value={newEvent.banner}
-          onChange={(e) => setNewEvent({ ...newEvent, banner: e.target.value })}
-        />
-        <button onClick={createNewEvent} className="bg-blue-600 text-white rounded-lg p-2">Create Event</button>
+    <div className="container mx-auto p-6 space-y-8">
+      
+ 
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Create New Event</h2>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="bg-green-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-700 focus:outline-none"
+        >
+          {showForm ? 'Cancel' : 'Create New Event'}
+        </button>
+        {showForm && (
+          <div className="grid grid-cols-2 gap-6 mt-6">
+            <input
+              type="text"
+              placeholder="Event Title"
+              className="border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              value={newEvent.title}
+              onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+            />
+            <input
+              type="date"
+              className="border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              value={newEvent.date}
+              onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+            />
+            <input
+              type="time"
+              className="border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              value={newEvent.time}
+              onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Location"
+              className="border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              value={newEvent.location}
+              onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Author"
+              className="border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              value={newEvent.author}
+              onChange={(e) => setNewEvent({ ...newEvent, author: e.target.value })}
+            />
+            <textarea
+              placeholder="Description"
+              className="border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 col-span-2 focus:outline-none"
+              value={newEvent.description}
+              onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Banner URL"
+              className="border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 col-span-2 focus:outline-none"
+              value={newEvent.image}
+              onChange={(e) => setNewEvent({ ...newEvent, image: e.target.value })}
+            />
+          </div>
+        )}
+        {showForm && (
+          <button
+            onClick={createNewEvent}
+            className="mt-6 bg-green-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-green-700 focus:outline-none"
+          >
+            Create Event
+          </button>
+        )}
       </div>
 
-      {/* View Upcoming Events Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold mb-4">Upcoming Events</h2>
-        <ul className="space-y-2">
+
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Upcoming Events</h2>
+        <ul className="space-y-4">
           {events.map((event) => (
-            <li key={event._id} className="flex justify-between items-center bg-gray-50 p-4 rounded-lg">
-              <div>
-                <h4 className="font-bold">{event.title}</h4>
-                <p>{event.date} at {event.time}</p>
-                <p>{event.location}</p>
-                <p>{event.description}</p>
-                {event.banner && <img src={event.banner} alt="Event Banner" className="w-32 h-32 object-cover mt-2" />}
+            <li key={event._id} className="flex justify-between items-center bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-xl transition duration-300 ease-in-out transform">
+              <div className="flex flex-col">
+                <h3 className="font-bold text-lg text-gray-800">{event.title}</h3>
+                <p className="text-sm text-gray-600">{formatDate(event.date)} at {event.time}</p>
+                <p className="text-sm text-gray-600">{event.location}</p>
+                <p className="text-sm text-gray-600">
+                  {expandedEvent === event._id ? event.description : `${event.description.slice(0, 100)}...`} 
+                  {event.description.length > 100 && (
+                    <button 
+                      onClick={() => toggleDescription(event._id)} 
+                      className="text-blue-500 hover:underline"
+                    >
+                      {expandedEvent === event._id ? 'View Less' : 'View More'}
+                    </button>
+                  )}
+                </p>
+                {event.image && <img src={event.image} alt="Event Banner" className="w-full h-32 object-cover mt-4 rounded-md shadow-md" />}
               </div>
-              <div>
-                <button onClick={() => deleteEventById(event._id)} className="text-red-600">Delete</button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Event Registration Management Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold mb-4">Event Registration Management</h2>
-        <ul className="space-y-2">
-          {attendees.map((attendee) => (
-            <li key={attendee.id} className="flex justify-between items-center">
-              <span>{attendee.name}</span>
-              <div>
-                <button onClick={() => approveRegistration(attendee.id)} className="text-green-600">Approve</button>
-                <button onClick={() => declineRegistration(attendee.id)} className="text-red-600 ml-4">Decline</button>
+              <div className="flex flex-col justify-between items-center">
+                <button onClick={() => deleteEventById(event._id)} className="text-red-600 hover:text-red-800 transition duration-200 ease-in-out">Delete</button>
               </div>
             </li>
           ))}
@@ -141,3 +162,4 @@ function Events() {
 }
 
 export default Events;
+

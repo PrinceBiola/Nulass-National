@@ -13,6 +13,8 @@ export const fetchPosts = async () => {
     }
 };
 
+
+
 // Create a new blog post
 export const createPost = async (postData) => {
     try {

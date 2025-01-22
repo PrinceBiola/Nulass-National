@@ -1,28 +1,61 @@
-import React from 'react';
-import { 
-  FaUsers, FaCalendarAlt, FaBlog, 
-  FaChartLine, FaArrowUp, FaArrowDown 
+
+import React, { useState, useEffect } from 'react';
+import {
+  FaUsers, FaCalendarAlt, FaBlog,
+  FaChartLine, FaArrowUp, FaArrowDown,
 } from 'react-icons/fa';
+import { fechUser } from '../../api/general';
+import { fetchPosts } from '../../api/blog';
+import { fetchEvents } from '../../api/event';
+import { useAuthContext } from '../../context/AuthContext';
 
 function Dashboard() {
-  const stats = [
+  const { user } = useAuthContext();
+  const [members, setMembers] = useState(0);
+  const [blogs, setBlogs] = useState(0);
+  const [events, setEvents] = useState(0);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const fetchedUser = await fechUser();
+        setMembers(fetchedUser.length);
+
+        const fetchedBlogs = await fetchPosts();
+        setBlogs(fetchedBlogs.length);
+
+        const fetchedEvents = await fetchEvents();
+        setEvents(fetchedEvents.length);
+
+        console.log('Users:', fetchedUser.length, 'Blogs:', fetchedBlogs.length, 'Events:', fetchedEvents.length);
+      } catch (error) {
+        setError('Failed to fetch data.');
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Admin stats
+  const adminStats = [
     {
       title: 'Total Members',
-      value: '245',
+      value: members,
       icon: FaUsers,
       change: '+12%',
       isIncrease: true,
     },
     {
       title: 'Upcoming Events',
-      value: '5',
+      value: events,
       icon: FaCalendarAlt,
       change: '0%',
       isIncrease: true,
     },
     {
       title: 'Blog Posts',
-      value: '32',
+      value: blogs,
       icon: FaBlog,
       change: '+5%',
       isIncrease: true,
@@ -36,7 +69,39 @@ function Dashboard() {
     },
   ];
 
-  const recentActivities = [
+  // Normal user stats
+  const userStats = [
+    {
+      title: 'Registered Events',
+      value: events, 
+      icon: FaCalendarAlt,
+      change: '+3%',
+      isIncrease: true,
+    },
+    {
+      title: 'Read Blogs',
+      value: blogs, // Assume this is fetched separately for the user
+      icon: FaBlog,
+      change: '+8%',
+      isIncrease: true,
+    },
+    {
+      title: 'Profile Completion',
+      value: '85%',
+      icon: FaUsers,
+      change: '+10%',
+      isIncrease: true,
+    },
+    {
+      title: 'Active Sessions',
+      value: '4',
+      icon: FaChartLine,
+      change: '0%',
+      isIncrease: true,
+    },
+  ];
+
+  const recentActivities = user?.role === 'admin' ? [
     {
       type: 'user',
       message: 'New member registration: John Doe',
@@ -52,13 +117,29 @@ function Dashboard() {
       message: 'Upcoming event: Leadership Summit 2024',
       time: '3 hours ago',
     },
+  ] : [
+    {
+      type: 'event',
+      message: 'You registered for "Leadership Summit 2024"',
+      time: '2 days ago',
+    },
+    {
+      type: 'blog',
+      message: 'You read: "NULASS Annual Conference"',
+      time: '3 days ago',
+    },
+    {
+      type: 'profile',
+      message: 'Updated profile picture',
+      time: '5 days ago',
+    },
   ];
 
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
+        {(user?.role === 'admin' ? adminStats : userStats).map((stat, index) => (
           <div
             key={index}
             className="bg-white p-6 rounded-lg shadow-sm border border-gray-200"
@@ -120,4 +201,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard; 
+export default Dashboard;

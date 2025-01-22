@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Blog = require('../models/blogModel');
 const Event = require('../models/eventModel');
+const User = require('../models/User');
 
 // Create a new blog
 router.post('/blogs', async (req, res) => {
@@ -31,6 +32,15 @@ router.get('/blogs', async (req, res) => {
     try {
         const blogs = await Blog.find();
         res.status(200).json(blogs);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.get('/users', async (req, res) => {
+    try {
+        const users = await User.find();
+        res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

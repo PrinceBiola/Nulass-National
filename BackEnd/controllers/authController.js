@@ -26,58 +26,89 @@ const storage = multer.diskStorage({
     },
 });
 const upload = multer({ storage });
-
 router.post('/register', async (req, res) => {
-    const { surname, name, email, password } = req.body;
-
-    if (!surname || !name || !email || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new User({
-        surname,
-        name,
-        email,
-        password: hashedPassword,
-    });
-
-    // console.log("pass", hashedPassword)
-
     try {
-        await newUser.save();
-        res.status(201).json({ message: 'User registered successfully', newUser });
+        const { email, password, surname, name } = req.body;
+        console.log('Received register request:', { email, password, surname, name });
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            console.log('User already exists:', email);
+            return res.status(400).json({ message: "User already exists" });
+        }
+
+        const user = new User({
+            name,
+            surname,
+            email,
+            password,
+            role: 'normal_user'
+        });
+
+        await user.save();
+        console.log('User created successfully:', user);
+
+        res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            token: generateToken(user),
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Error registering user', error });
+        console.error('Register error:', error.message);
+        res.status(500).json({ error: error.message });
     }
 });
-
 
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    console.log('Login attempt:', { email, password });
+    try {
+        const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    console.log('User found:', user);
+        const user = await User.findOne({ email });
+        console.log('User found:', user);
 
-    if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        if (!user) {
+            return res.status(401).json({ 
+                success: false,
+                message: 'Invalid credentials' 
+            });
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log('Login plain password:', password);
+        console.log('Hashed password in DB:', user.password);
+        console.log('Password match:', isMatch);
+
+        if (!isMatch) {
+            return res.status(401).json({ 
+                success: false,
+                message: 'Invalid credentials' 
+            });
+        }
+        const token = generateToken(user);
+
+        res.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            token: token,
+        });
+
+        console.log('Token generated:', token);
+    } catch (error) {
+        console.error('Login error:', error.message);
+
+        res.status(500).json({ 
+            success: false,
+            message: 'Server error during login',
+            error: error.message,
+        });
     }
-
-    console.log('Hashed password:', user.password);
-    console.log('Password to compare:', password);
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password match:', isMatch);
-
-    if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).json({ message: 'Login successful', token, user });
 });
+
+
+
+
 
 router.put('/profile', upload.single('profilePicture'), async (req, res) => {
     const { username } = req.body;
@@ -130,6 +161,44 @@ const authenticateJWT = (req, res, next) => {
         next();
     });
 };
+
+
+const generateToken = (user) => {
+    const payload = {
+        id: user._id,
+        role: user.role,
+        email: user.email
+    };
+    
+    console.log('Generating token with payload:', {
+        id: payload.id,
+        role: payload.role,
+        email: payload.email
+    });
+    
+    return jwt.sign(
+        payload,
+        process.env.JWT_SECRET,
+        { expiresIn: '30d' }
+    );
+};
+
+
+// user managemebt
+
+
+router.delete('/users/:id', async (req, res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.params.id);
+        if (!user) return res.status(404).json({ message: 'user not found' });
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+
+
 router.use(authenticateJWT);
 module.exports = router;
 

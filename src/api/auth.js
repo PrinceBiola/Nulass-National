@@ -7,9 +7,12 @@ export const registerUser = async (userData) => {
     return await axios.post(`${API_URL}/register`, userData);
 };
 
+
+
 // Login user
 export const loginUser = async (credentials) => {
     return await axios.post(`${API_URL}/login`, credentials);
+ 
 };
 
 export const sendOtp = async (email) => {
@@ -27,6 +30,18 @@ export const verifyOtp = async (data) => {
 export const updatePassword = async (data) => {
     return await axios.post(`${API_URL}/update-password`, data);
 };
+
+export const deleteuser = async ({ id }) => {
+    try {
+     
+      return await axios.delete(`${API_URL}/users/${id}`);
+    } catch (error) {
+      throw new Error('Error deleting user: ' + error.message);
+    }
+  };
+  
+
+
 
 
 

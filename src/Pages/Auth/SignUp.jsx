@@ -2,10 +2,11 @@ import React, { useState, useContext } from "react";
 import NavWrapper from "../../Components/NavWrapper";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from '../../api/auth';
-import { AuthContext } from '../../context/AuthContext';
+import { useAuthContext } from "../../context/AuthContext";
 
 export default function SignUp() {
-  const { login } = useContext(AuthContext);
+  // const {user} = useContext(useAuthContext);
+  const [user, setUser] = useState("")
   const [showPassword, setShowPassword] = useState(false);
   const [surname, setSurname] = useState('');
   const [name, setName] = useState('');
@@ -27,7 +28,7 @@ export default function SignUp() {
 
     try {
       const response = await registerUser({ surname, name, email, password });
-      login(response.data.user);
+      setUser(response.data.user);
       setSuccess('Registration successful! Please log in.');
       navigate('/login');
     } catch (err) {

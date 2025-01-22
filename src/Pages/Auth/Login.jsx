@@ -1,32 +1,50 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import NavWrapper from "../../Components/NavWrapper";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from '../../api/auth';
-import { AuthContext } from '../../context/AuthContext';
+import { useAuthContext } from "../../context/AuthContext";
+// import { AuthContext } from '../../context/AuthContext';
 
 export default function Login() {
-  const { login } = useContext(AuthContext);
+  let { user } = useAuthContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+    const { handleChange } = useAuthContext();
 
   const navigate = useNavigate();
-
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
       const response = await loginUser({ email, password });
-      login(response.data.user);
-      setSuccess('Login successful!');
-      navigate('/');
+      setSuccess("Login successful!");
+      handleChange(response.data, response.data.token); 
+      navigate("/dashboard"); 
+      if (response.data.token) {
+        localStorage.setItem('user', JSON.stringify(response.data));
+    }
+    console.log("response", response.data);
+ 
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || "Login failed");
     }
   };
+
+     
+
+    // } catch (err) {
+    //   setError(err.response?.data?.message || 'Login failed');
+    // }
+  // };
 
   return (
     <NavWrapper>
