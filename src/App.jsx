@@ -216,6 +216,9 @@ import { AuthProvider } from "./context/AuthContext";
 import ForgotPassword from "./Pages/Auth/ForgotPassword";
 import PrivateRoutes from "./Utils/PrivateRoutes";
 import Profile from "./Pages/Profile/Profile";
+import Application from "./Pages/Application/Application";
+import AdminDashboard from "./Components/Dashboard/AdminDashbaord";
+import UserOrders from "./Components/Order/UserOrders";
 // import InstiEvent from "./Pages/InstiEvent/InstiEvent";
 
 
@@ -255,6 +258,30 @@ function App() {
      element={
        <DashboardLayout>
          <Profile />
+       </DashboardLayout>
+     }
+   />
+              <Route
+     path="/user-order"
+     element={
+       <DashboardLayout>
+         <UserOrders />
+       </DashboardLayout>
+     }
+   />
+              <Route
+     path="/AdminDashboard"
+     element={
+       <DashboardLayout>
+         <AdminDashboard />
+       </DashboardLayout>
+     }
+   />
+              <Route
+     path="/application"
+     element={
+       <DashboardLayout>
+         <Application />
        </DashboardLayout>
      }
    />

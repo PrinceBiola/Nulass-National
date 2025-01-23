@@ -2,8 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Blog = require('../models/blogModel');
 const Event = require('../models/eventModel');
-const User = require('../models/User');
-
+const Application = require('../models/Application');
+const Order = require('../models/Order');
+// const { verifyPaystackPayment } = require('../utils/paymentUtils');
+const { protect, admin } = require('../middleware/authMiddleware');
+const { verifyPaystackPayment } = require('../utils/paystack');
 // Create a new blog
 router.post('/blogs', async (req, res) => {
     try {
@@ -152,6 +155,99 @@ router.get('/events', async (req, res) => {
 });
 
 
+
+
+
+
+
+// User applies for ID
+router.post('/apply', protect, async (req, res) => {
+    const { firstName, lastName, email, phoneNumber, institution, department, level, matricNumber, address, lgaOfOrigin, stateOfResidence } = req.body;
+    try {
+      const application = await Application.create({
+        user: req.user._id,
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        institution,
+        department,
+        level,
+        matricNumber,
+        address,
+        lgaOfOrigin,
+        stateOfResidence,
+      });
+  
+      req.user.role = 'application_user';
+      await req.user.save();
+  
+      res.status(201).json(application);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+
+  router.get('/applications', protect, admin, async (req, res) => {
+    try {
+      const applications = await Application.find().populate('user');
+      res.status(200).json(applications);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  router.patch('/applications/:id', protect, admin, async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    try {
+      const application = await Application.findById(id);
+      if (!application) return res.status(404).json({ message: 'Application not found' });
+  
+      application.status = status;
+      await application.save();
+  
+      if (status === 'approved') {
+        await Order.create({ user: application.user, application: application._id });
+      }
+  
+      res.status(200).json(application);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // User views their orders
+  router.get('/orders', protect, async (req, res) => {
+    try {
+      const orders = await Order.find({ user: req.user._id }).populate('application');
+      res.status(200).json(orders);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Verify payment and update status
+  router.post('/verify-payment', protect, async (req, res) => {
+    const { reference, applicationId } = req.body;
+    try {
+      const isValid = await verifyPaystackPayment(reference);
+      if (!isValid) return res.status(400).json({ message: 'Invalid payment reference' });
+  
+      const application = await Application.findById(applicationId);
+      if (!application) return res.status(404).json({ message: 'Application not found' });
+  
+      application.paymentReference = reference;
+      application.paymentStatus = 'paid';
+      await application.save();
+  
+      res.status(200).json(application);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
 
 
 module.exports = router;

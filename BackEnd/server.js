@@ -17,6 +17,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api', require('./controllers/generalController'));
+// app.use('/apis', require('./routes/general'));
 app.use('/api/auth', require('./controllers/authController'));
 
 

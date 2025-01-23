@@ -32,7 +32,7 @@ function DashboardLayout({ children }) {
 
   const menuItems = [
     { path: "/dashboard", icon: FaHome, label: "Dashboard", roles: ["admin", "normal_user", "superadmin"] },
-    { path: "dashbaord/application", icon: FaHome, label: "Application", roles: ["normal_user"] },
+    { path: "/application", icon: FaHome, label: "Application", roles: ["normal_user"] },
     { path: "/dashboard/users", icon: FaUsers, label: "User Management", roles: ["admin"] },
     { path: "/dashboard/blog", icon: FaBlog, label: "Blog Management", roles: ["admin"] },
     { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", "normal_user", "institution"] },
@@ -40,7 +40,6 @@ function DashboardLayout({ children }) {
     { path: "/dashboard/analytics", icon: FaChartBar, label: "Analytics", roles: ["admin", "normal_user"] },
     { path: "/dashboard/messages", icon: FaEnvelope, label: "Communication", roles: ["admin"] },
     { path: "/dashboard/settings", icon: FaCog, label: "Settings", roles: ["admin"] },
-
     { path: "/profile", icon: FaUserCircle, label: "Profile", roles: ["admin", "normal_user", "institution", "superadmin"] },
   ];
 

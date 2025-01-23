@@ -15,3 +15,16 @@ export const fechUser = async () => {
 };
 
 
+
+// Register user
+export const ApplyUser = async (data, token) => {
+    return await axios.post(`${API_URL}/apply`, data, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+          }          
+    });
+    
+  };
+
+
+
