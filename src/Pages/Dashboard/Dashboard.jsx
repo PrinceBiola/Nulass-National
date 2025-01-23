@@ -37,7 +37,6 @@ function Dashboard() {
     loadData();
   }, []);
 
-  // Admin stats
   const adminStats = [
     {
       title: 'Total Members',
@@ -75,12 +74,42 @@ function Dashboard() {
       title: 'Registered Events',
       value: events, 
       icon: FaCalendarAlt,
-      change: '+3%',
+      // change: '+3%',
       isIncrease: true,
     },
     {
       title: 'Read Blogs',
       value: blogs, // Assume this is fetched separately for the user
+      icon: FaBlog,
+      change: '+8%',
+      isIncrease: true,
+    },
+    {
+      title: 'Profile Completion',
+      value: '85%',
+      icon: FaUsers,
+      change: '+10%',
+      isIncrease: true,
+    },
+    {
+      title: 'Active Sessions',
+      value: '4',
+      icon: FaChartLine,
+      change: '0%',
+      isIncrease: true,
+    },
+  ];
+  const   SuperAdminStats = [
+    {
+      title: 'fffff Events',
+      value: events, 
+      icon: FaCalendarAlt,
+      change: '+3%',
+      isIncrease: true,
+    },
+    {
+      title: 'ffff Blogs',
+      value: blogs, 
       icon: FaBlog,
       change: '+8%',
       isIncrease: true,
@@ -139,7 +168,7 @@ function Dashboard() {
     <div className="space-y-6">
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {(user?.role === 'admin' ? adminStats : userStats).map((stat, index) => (
+        {(user?.role === 'admin' ?   adminStats :  user?.role === "superadmin" ?  SuperAdminStats : userStats).map((stat, index) => (
           <div
             key={index}
             className="bg-white p-6 rounded-lg shadow-sm border border-gray-200"
