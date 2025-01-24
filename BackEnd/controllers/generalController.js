@@ -4,10 +4,48 @@ const Blog = require('../models/blogModel');
 const Event = require('../models/eventModel');
 const Application = require('../models/Application');
 const Order = require('../models/Order');
-// const { verifyPaystackPayment } = require('../utils/paymentUtils');
 const { protect, admin } = require('../middleware/authMiddleware');
-const { verifyPaystackPayment } = require('../utils/paystack');
+require('dotenv').config();
+
+const User = require('../models/User');
+const nodemailer = require('nodemailer');
+const { verifyPayment } = require('../utils/paystack');
 // Create a new blog
+
+
+let transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: true,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+    },
+      tls: {
+          rejectUnauthorized: false,
+      },
+  });
+  
+  // Utility function to send email
+  const sendEmail = async (to, subject, text) => {
+    try {
+      const mailOptions = {
+        from: `"NULLAS NATIONAL"<${process.env.MAIL_FROM_ADDRESS}>`,
+        to,
+        subject,
+        text, // Email body (plain text)
+      };
+  
+      await transporter.sendMail(mailOptions);
+      console.log(`Email sent to ${to}`);
+    } catch (error) {
+      console.error("Error sending email:", error.message);
+      throw new Error("Failed to send email");
+    }
+  };
+  
+
+
 router.post('/blogs', async (req, res) => {
     try {
         const blog = new Blog({
@@ -153,18 +191,59 @@ router.get('/events', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+router.get('/users', async (req, res) => {
+    try {
+        const users = await User.find();
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 
+router.delete('/users/:id', async (req, res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
+// router.post('/apply', protect, async (req, res) => {
+//     const { firstName, lastName, email, phoneNumber, institution, department, level, matricNumber, address, lgaOfOrigin, stateOfResidence } = req.body;
+//     try {
+//       const application = await Application.create({
+//         user: req.user._id,
+//         firstName,
+//         lastName,
+//         email,
+//         phoneNumber,
+//         institution,
+//         department,
+//         level,
+//         matricNumber,
+//         address,
+//         lgaOfOrigin,
+//         stateOfResidence,
+//       });
+  
+//       req.user.role = 'application_user';
+//       await req.user.save();
+  
+//       res.status(201).json(application);
+//     } catch (error) {
+//       res.status(500).json({ message: error.message });
+//     }
+//   });
 
-
-
-
-// User applies for ID
 router.post('/apply', protect, async (req, res) => {
     const { firstName, lastName, email, phoneNumber, institution, department, level, matricNumber, address, lgaOfOrigin, stateOfResidence } = req.body;
+  
     try {
-      const application = await Application.create({
+      // Create a new application
+      const application = new Application({
         user: req.user._id,
         firstName,
         lastName,
@@ -179,14 +258,26 @@ router.post('/apply', protect, async (req, res) => {
         stateOfResidence,
       });
   
-      req.user.role = 'application_user';
-      await req.user.save();
+      // Save the application
+      await application.save();
   
-      res.status(201).json(application);
+      // Create an order with payment status 'unpaid'
+      const order = new Order({
+        user: req.user._id,
+        application: application._id, // link the order to the application
+        paymentStatus: 'unpaid', // default payment status
+        reference: null, // Placeholder for now, to be filled after payment verification
+      });
+  
+      // Save the order
+      await order.save();
+  
+      res.status(201).json({ message: 'Application and order created successfully!', application });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   });
+  
 
 
   router.get('/applications', protect, admin, async (req, res) => {
@@ -198,25 +289,48 @@ router.post('/apply', protect, async (req, res) => {
     }
   });
 
-  router.patch('/applications/:id', protect, admin, async (req, res) => {
-    const { id } = req.params;
+router.patch('/applications/:id', protect, admin, async (req, res) => {
+    const { id } = req.params; // Application ID
     const { status } = req.body;
-    try {
-      const application = await Application.findById(id);
-      if (!application) return res.status(404).json({ message: 'Application not found' });
   
+    try {
+      // Find the application by ID
+      const application = await Application.findById(id);
+      if (!application) {
+        return res.status(404).json({ message: 'Application not found' });
+      }
+  
+      // Update application status
       application.status = status;
       await application.save();
   
-      if (status === 'approved') {
-        await Order.create({ user: application.user, application: application._id });
+      // Find the order linked to the application
+      const orders = await Order.findOne({ application: _id });
+      if (!orders) {
+        return res.status(404).json({ message: 'Order not found for this application' });
       }
   
-      res.status(200).json(application);
+      // If approved and payment is completed, create unique ID and send email
+      if (status === 'approved' && orders.paymentStatus === 'paid') {
+        console.log(status);
+        const uniqueId = `NULLAS-${Date.now()}`;
+        await Order.create({
+          user: application.user,
+          application: application._id,
+          uniqueId,
+        });
+  
+        // Send email with unique ID
+        await sendEmail(application.email, 'Application Approved', `Your Unique ID: ${uniqueId}`);
+      }
+  
+      res.status(200).json({ message: 'Application status updated!', application });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   });
+  
+  
   
   // User views their orders
   router.get('/orders', protect, async (req, res) => {
@@ -228,11 +342,11 @@ router.post('/apply', protect, async (req, res) => {
     }
   });
   
-  // Verify payment and update status
-  router.post('/verify-payment', protect, async (req, res) => {
+
+router.post('/verify-payment', protect, async (req, res) => {
     const { reference, applicationId } = req.body;
     try {
-      const isValid = await verifyPaystackPayment(reference);
+      const isValid = await verifyPayment(reference);
       if (!isValid) return res.status(400).json({ message: 'Invalid payment reference' });
   
       const application = await Application.findById(applicationId);
@@ -242,7 +356,7 @@ router.post('/apply', protect, async (req, res) => {
       application.paymentStatus = 'paid';
       await application.save();
   
-      res.status(200).json(application);
+      res.status(200).json({ message: 'Payment verified and updated!', application });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

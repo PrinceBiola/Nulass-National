@@ -5,6 +5,7 @@ const OrderSchema = mongoose.Schema({
   application: { type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true },
   paymentStatus: { type: String, default: 'unpaid', enum: ['unpaid', 'paid'] },
   reference: { type: String },
+  uniqueId: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', OrderSchema);
