@@ -219,6 +219,7 @@ import Profile from "./Pages/Profile/Profile";
 import Application from "./Pages/Application/Application";
 import AdminDashboard from "./Components/Dashboard/AdminDashbaord";
 import UserOrders from "./Components/Order/UserOrders";
+import IdCard from "./Pages/IdCard/IdCard";
 // import InstiEvent from "./Pages/InstiEvent/InstiEvent";
 
 
@@ -282,6 +283,14 @@ function App() {
      element={
        <DashboardLayout>
          <Application />
+       </DashboardLayout>
+     }
+   />
+              <Route
+     path="/idcard"
+     element={
+       <DashboardLayout>
+         <IdCard />
        </DashboardLayout>
      }
    />

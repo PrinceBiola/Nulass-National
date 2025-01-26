@@ -33,6 +33,7 @@ function DashboardLayout({ children }) {
   const menuItems = [
     { path: "/dashboard", icon: FaHome, label: "Dashboard", roles: ["admin", "normal_user", "superadmin"] },
     { path: "/application", icon: FaHome, label: "Application", roles: ["normal_user"] },
+    { path: "/idcard", icon: FaHome, label: "ID Card ", roles: ["normal_user"] },
     { path: "/dashboard/users", icon: FaUsers, label: "User Management", roles: ["admin"] },
     { path: "/dashboard/blog", icon: FaBlog, label: "Blog Management", roles: ["admin"] },
     { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", "normal_user", "institution"] },
