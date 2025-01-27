@@ -1,62 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import NavWrapper from "../../Components/NavWrapper";
 import { motion } from 'framer-motion';
-import { FaMapMarkerAlt, FaClock, FaCalendarAlt, FaFilter, FaSearch } from 'react-icons/fa';
-import Blog1 from '../../assets/Images/Blog1.jpeg';
+import { FaMapMarkerAlt, FaClock, FaCalendarAlt, FaSearch } from 'react-icons/fa';
+import { fetchEvents } from "../../api/event";
 
 function Eventss() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [events, setEvents] = useState([]); 
+  const [error, setError] = useState(null);
 
-  const categories = [
-    { id: 'all', name: 'All Events' },
-    { id: 'upcoming', name: 'Upcoming' },
-    { id: 'cultural', name: 'Cultural' },
-    { id: 'academic', name: 'Academic' },
-    { id: 'leadership', name: 'Leadership' },
-    { id: 'social', name: 'Social' }
-  ];
+  
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const fetchedEvents = await fetchEvents(); 
+        setEvents(fetchedEvents);
+      } catch (error) {
+        setError("Failed to fetch events.");
+        console.error(error);
+      }
+    };
+    loadEvents();
+  }, []);
 
-  const events = [
-    {
-      title: "NULASS National Day Celebration",
-      date: "July 15, 2024",
-      time: "10:00 AM - 4:00 PM",
-      location: "Lagos State University Main Campus",
-      image: Blog1,
-      description: "Join us for a day of cultural celebration, networking, and entertainment as we showcase the rich heritage of Lagos State.",
-      category: "cultural",
-      registrationLink: "/events/register",
-      status: "upcoming"
-    },
-    {
-      title: "Leadership Summit 2024",
-      date: "August 5, 2024",
-      time: "9:00 AM - 3:00 PM",
-      location: "University of Lagos, Multipurpose Hall",
-      image: Blog1,
-      description: "Develop your leadership skills with workshops and sessions led by prominent leaders and industry experts.",
-      category: "leadership",
-      registrationLink: "/events/register",
-      status: "upcoming"
-    },
-    {
-      title: "Career Fair & Networking",
-      date: "September 10, 2024",
-      time: "11:00 AM - 5:00 PM",
-      location: "Lagos Continental Hotel",
-      image: Blog1,
-      description: "Connect with potential employers and industry professionals at our annual career fair.",
-      category: "academic",
-      registrationLink: "/events/register",
-      status: "upcoming"
-    }
-  ];
 
   const filteredEvents = events.filter(event => {
-    const matchesFilter = activeFilter === 'all' || event.category === activeFilter || event.status === activeFilter;
-    const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter =
+      activeFilter === 'all' || event.category === activeFilter || event.status === activeFilter;
+    const matchesSearch =
+      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -82,24 +56,24 @@ function Eventss() {
                   placeholder="Search events..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 pl-10 rounded-lg border focus:ring-2 focus:ring-customGreen focus:outline-none"
+                  className="w-full px-4 py-2 pl-10 rounded-lg border focus:ring-2 focus:ring-green-500 focus:outline-none"
                 />
                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               </div>
 
               {/* Filter Buttons */}
               <div className="flex flex-wrap gap-2">
-                {categories.map(category => (
+                {['all', 'upcoming', 'cultural', 'academic', 'leadership', 'social'].map(category => (
                   <button
-                    key={category.id}
-                    onClick={() => setActiveFilter(category.id)}
+                    key={category}
+                    onClick={() => setActiveFilter(category)}
                     className={`px-4 py-2 rounded-full transition-colors ${
-                      activeFilter === category.id
-                        ? 'bg-customGreen text-white'
+                      activeFilter === category
+                        ? 'bg-green-500 text-white'
                         : 'bg-white text-gray-600 hover:bg-gray-100'
                     }`}
                   >
-                    {category.name}
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
                   </button>
                 ))}
               </div>
@@ -124,7 +98,7 @@ function Eventss() {
                     className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500"
                   />
                   <div className="absolute top-4 left-4">
-                    <span className="bg-customGreen text-white text-sm px-3 py-1 rounded-full">
+                    <span className="bg-green-500 text-white text-sm px-3 py-1 rounded-full">
                       {event.category.charAt(0).toUpperCase() + event.category.slice(1)}
                     </span>
                   </div>
@@ -140,20 +114,20 @@ function Eventss() {
 
                   <div className="space-y-2 text-sm text-gray-500 mb-4">
                     <div className="flex items-center gap-2">
-                      <FaCalendarAlt className="text-customGreen" />
+                      <FaCalendarAlt className="text-green-500" />
                       <span>{event.date}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <FaClock className="text-customGreen" />
+                      <FaClock className="text-green-500" />
                       <span>{event.time}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <FaMapMarkerAlt className="text-customGreen" />
+                      <FaMapMarkerAlt className="text-green-500" />
                       <span>{event.location}</span>
                     </div>
                   </div>
 
-                  <button className="w-full bg-customGreen text-white py-2 rounded-lg font-semibold hover:bg-opacity-90 transition-all">
+                  <button className="w-full bg-green-500 text-white py-2 rounded-lg font-semibold hover:bg-opacity-90 transition-all">
                     Register Now
                   </button>
                 </div>
@@ -162,11 +136,18 @@ function Eventss() {
           </div>
 
           {/* No Results Message */}
-          {filteredEvents.length === 0 && (
+          {filteredEvents.length === 0 && !error && (
             <div className="text-center py-12">
               <p className="text-gray-600 text-lg">
                 No events found matching your criteria.
               </p>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {error && (
+            <div className="text-center py-12 text-red-600">
+              <p>{error}</p>
             </div>
           )}
         </div>

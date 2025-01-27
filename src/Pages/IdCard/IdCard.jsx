@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import Logo from "../../assets/Images/Logo.png";
 
 function IdCard() {
@@ -11,68 +10,72 @@ function IdCard() {
   };
 
   const generateIdCard = () => {
-    if (idNumber !== "") {
+    if (idNumber.trim() !== "") {
       setGeneratedId(idNumber);
     }
   };
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6">ID Card Generator</h1>
 
-      <div className="flex items-center space-x-4">
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-transparent">
+      {/* Header */}
+      <h1 className="text-4xl font-bold mb-6 text-center">
+        NULASS ID Card Generator
+      </h1>
+
+      {/* Input Section */}
+      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
         <input
           type="number"
           value={idNumber}
           onChange={handleInputChange}
-          placeholder="Enter ID number"
-          className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-customGreen focus:border-transparent transition w-80"
+          placeholder="Enter your ID number"
+          className="w-full px-4 py-3 mb-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 transition"
         />
         <button
           onClick={generateIdCard}
-          className="px-6 py-2 bg-customGreen text-white font-medium rounded-lg shadow hover:bg-green-600 transition"
+          className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg shadow-md transition"
         >
           Generate ID Card
         </button>
       </div>
 
+      {/* ID Card Preview */}
       {generatedId && (
-        <div className="mt-8 p-6 w-96 bg-white rounded-2xl shadow-xl border border-gray-200">
-          <div className="flex items-center mb-6">
-            <img src={Logo} alt="" className="w-12" />
+        <div className="mt-8 bg-white w-full max-w-sm rounded-2xl shadow-xl p-6">
+          <div className="flex items-center border-b pb-4 mb-4">
+            <img src={Logo} alt="Logo" className="w-14 h-14" />
             <div className="ml-4">
-              <h1 className="text-lg font-bold text-gray-700">
-                NULASS National ID Card
-              </h1>
-              <p className="text-sm text-gray-500">
-                Empowering Students Nationwide
-              </p>
+              <h2 className="text-xl font-bold text-gray-700">NULASS National ID Card</h2>
+              <p className="text-sm text-gray-500">Empowering Students Nationwide</p>
             </div>
           </div>
-          <div>
-            <div className="flex items-center mb-6">
-              <div className="w-20 h-20 bg-gray-200 rounded-full overflow-hidden">
-                <img
-                  src={Logo}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+
+          <div className="flex flex-col items-center">
+            <div className="w-24 h-24 bg-gray-200 rounded-full overflow-hidden mb-4">
+              <img
+                src={Logo}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
             </div>
-          </div>
-          <div className="ml-4">
-            <p className="text-gray-700 font-medium text-lg">John Doe</p>
-            <p className="text-gray-500 text-sm font-semibold">
+            <p className="text-lg font-semibold text-gray-700">John Doe</p>
+            <p className="text-gray-500 text-sm font-medium mb-4">
               ID: {generatedId}
             </p>
-            <p className="text-gray-500 text-sm font-semibold">
+            <p className="text-gray-500 text-sm font-medium">
               Institution: Tai Solarin University of Education
             </p>
-            <p className="text-gray-500 text-sm font-semibold">
+            <p className="text-gray-500 text-sm font-medium">
               Matric Number: 20200204070
             </p>
           </div>
-          <button>
-            Download
+
+          {/* Download Button */}
+          <button
+            className="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg shadow-md font-semibold transition"
+            onClick={() => alert("Download functionality coming soon!")}
+          >
+            Download ID Card
           </button>
         </div>
       )}
