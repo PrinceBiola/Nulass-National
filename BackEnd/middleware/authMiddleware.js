@@ -1,4 +1,3 @@
-// middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
@@ -14,7 +13,6 @@ exports.protect = async (req, res, next) => {
       res.status(401).json({ message: 'Not authorized' });
     }
   }
-
   if (!token) return res.status(401).json({ message: 'Not authorized, no token' });
 };
 
@@ -24,5 +22,14 @@ exports.admin = (req, res, next) => {
     next();
   } else {
     res.status(403).json({ message: 'Not authorized as admin' });
+  }
+};
+
+
+exports.user = (req, res, next) => {
+  if (req.user && req.user.role === 'apllicationUser') {
+    next();
+  } else {
+    res.status(403).json({ message: 'Not authorized as Apllication User' })
   }
 };

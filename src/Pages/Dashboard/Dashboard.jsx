@@ -1,13 +1,35 @@
-
 import React, { useState, useEffect } from 'react';
 import {
-  FaUsers, FaCalendarAlt, FaBlog,
-  FaChartLine, FaArrowUp, FaArrowDown,
+  FaUsers, FaCalendarAlt, FaBlog, FaChartLine, 
+  FaArrowUp, FaArrowDown, FaDollarSign, FaUserShield
 } from 'react-icons/fa';
+import { Line, Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 import { fechUser } from '../../api/general';
 import { fetchPosts } from '../../api/blog';
 import { fetchEvents } from '../../api/event';
 import { useAuthContext } from '../../context/AuthContext';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 function Dashboard() {
   const { user } = useAuthContext();
@@ -15,6 +37,29 @@ function Dashboard() {
   const [blogs, setBlogs] = useState(0);
   const [events, setEvents] = useState(0);
   const [error, setError] = useState('');
+  const [revenue, setRevenue] = useState(25000); // Mock revenue data
+
+  // Mock data for charts
+  const userActivityData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+      label: 'User Activity',
+      data: [650, 590, 800, 810, 960, 1000],
+      fill: true,
+      borderColor: 'rgb(75, 192, 192)',
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      tension: 0.4,
+    }]
+  };
+
+  const revenueData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+      label: 'Revenue',
+      data: [4000, 5000, 6000, 5500, 7000, 7500],
+      backgroundColor: 'rgba(54, 162, 235, 0.5)',
+    }]
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -60,7 +105,7 @@ function Dashboard() {
       isIncrease: true,
     },
     {
-      title: 'Website Visits',
+      title: 'Revenue',
       value: '10,243',
       icon: FaChartLine,
       change: '-2%',
@@ -164,8 +209,55 @@ function Dashboard() {
     },
   ];
 
+  const getRoleDisplay = () => {
+    switch(user?.role) {
+      case 'admin':
+        return {
+          title: 'Administrator Dashboard',
+          badge: 'bg-purple-100 text-purple-800',
+          icon: <FaUserShield className="w-6 h-6" />
+        };
+      case 'normal_user':
+        return {
+          title: 'Member Dashboard',
+          badge: 'bg-blue-100 text-blue-800',
+          icon: <FaUsers className="w-6 h-6" />
+        };
+      case 'superadmin':
+        return {
+          title: 'Super Administrator Dashboard',
+          badge: 'bg-red-100 text-red-800',
+          icon: <FaUserShield className="w-6 h-6" />
+        };
+      default:
+        return {
+          title: 'Dashboard',
+          badge: 'bg-gray-100 text-gray-800',
+          icon: <FaUsers className="w-6 h-6" />
+        };
+    }
+  };
+
+  const roleDisplay = getRoleDisplay();
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 bg-gray-50">
+      {/* Dashboard Header */}
+      <div className="flex items-center justify-between bg-white p-6 rounded-xl shadow-sm">
+        <div className="flex items-center space-x-4">
+          {roleDisplay.icon}
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">{roleDisplay.title}</h1>
+            <span className={`px-3 py-1 rounded-full text-sm font-medium ${roleDisplay.badge}`}>
+              {user?.role?.replace('_', ' ').toUpperCase()}
+            </span>
+          </div>
+        </div>
+        <div className="text-sm text-gray-500">
+          Last updated: {new Date().toLocaleDateString()}
+        </div>
+      </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {(user?.role === 'admin' ?   adminStats :  user?.role === "superadmin" ?  SuperAdminStats : userStats).map((stat, index) => (
@@ -202,23 +294,53 @@ function Dashboard() {
         ))}
       </div>
 
-      {/* Recent Activities */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      {/* Charts Section */}
+      {user?.role === 'admin' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">User Activity</h3>
+            <Line data={userActivityData} options={{
+              responsive: true,
+              plugins: {
+                legend: { position: 'bottom' },
+              }
+            }} />
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">Revenue Overview</h3>
+            <Bar data={revenueData} options={{
+              responsive: true,
+              plugins: {
+                legend: { position: 'bottom' },
+              }
+            }} />
+          </div>
+        </div>
+      )}
+
+      {/* Recent Activities with enhanced styling */}
+      <div className="bg-white rounded-xl shadow-sm">
         <div className="p-6">
           <h2 className="text-lg font-semibold mb-4">Recent Activities</h2>
           <div className="space-y-4">
             {recentActivities.map((activity, index) => (
               <div
                 key={index}
-                className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg"
+                className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
               >
                 <div className="flex-shrink-0">
-                  {activity.type === 'user' && <FaUsers className="w-5 h-5 text-blue-500" />}
-                  {activity.type === 'blog' && <FaBlog className="w-5 h-5 text-green-500" />}
-                  {activity.type === 'event' && <FaCalendarAlt className="w-5 h-5 text-purple-500" />}
+                  <div className={`p-2 rounded-full ${
+                    activity.type === 'user' ? 'bg-blue-100' :
+                    activity.type === 'blog' ? 'bg-green-100' :
+                    'bg-purple-100'
+                  }`}>
+                    {activity.type === 'user' && <FaUsers className="w-5 h-5 text-blue-600" />}
+                    {activity.type === 'blog' && <FaBlog className="w-5 h-5 text-green-600" />}
+                    {activity.type === 'event' && <FaCalendarAlt className="w-5 h-5 text-purple-600" />}
+                  </div>
                 </div>
                 <div className="flex-1">
-                  <p className="text-gray-700">{activity.message}</p>
+                  <p className="text-gray-800 font-medium">{activity.message}</p>
                   <p className="text-sm text-gray-500 mt-1">{activity.time}</p>
                 </div>
               </div>

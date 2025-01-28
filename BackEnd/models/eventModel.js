@@ -13,6 +13,10 @@ const eventSchema = new moogose.Schema({
         type: Date,
         required: true,
     },
+    category: {
+        type: String,
+        required: true,
+    },
     location: {
         type: String,
         required: true,

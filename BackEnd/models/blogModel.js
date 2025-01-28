@@ -21,7 +21,7 @@ const blogSchema = new mongoose.Schema({
     image: {
         type: String,
         required: true
-      },
+    },
     author: {
 
         type: String,
@@ -31,6 +31,7 @@ const blogSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    
     comments: [{
         user: String,
         comment: String,

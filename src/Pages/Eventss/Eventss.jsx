@@ -99,7 +99,7 @@ function Eventss() {
                   />
                   <div className="absolute top-4 left-4">
                     <span className="bg-green-500 text-white text-sm px-3 py-1 rounded-full">
-                      {event.category.charAt(0).toUpperCase() + event.category.slice(1)}
+                      {event.category ? event.category.charAt(0).toUpperCase() + event.category.slice(1) : 'Uncategorized'}
                     </span>
                   </div>
                 </div>
