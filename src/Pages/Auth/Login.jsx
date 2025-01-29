@@ -113,12 +113,12 @@ export default function Login() {
               disabled={loading}
             >
               {loading ? (
-                <div className="flex justify-center items-center space-x-2">
+                <div className="flex justify-center items-center space-x-2 text-white">
                   <Loader2 className="animate-spin" />
                   <span>Logging in...</span>
                 </div>
               ) : (
-                "Login"
+                <p className="text-white">Login</p>
               )}
             </button>
           </form>

@@ -1,19 +1,22 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import NavWrapper from "../../Components/NavWrapper";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from '../../api/auth';
+import { registerUser } from "../../api/auth";
+import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import { useAuthContext } from "../../context/AuthContext";
 
 export default function SignUp() {
   // const {user} = useContext(useAuthContext);
-  const [user, setUser] = useState("")
+  const [user, setUser] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [surname, setSurname] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [surname, setSurname] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -23,16 +26,19 @@ export default function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
+    setLoading(true);
 
     try {
       const response = await registerUser({ surname, name, email, password });
       setUser(response.data.user);
-      setSuccess('Registration successful! Please log in.');
-      navigate('/login');
+      setSuccess("Registration successful! Please log in.");
+      navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,19 +48,27 @@ export default function SignUp() {
         setSuccess("");
         setError("");
       }, 3000);
-      return () => clearTimeout(timer); 
+      return () => clearTimeout(timer);
     }
   }, [success, error]);
 
   return (
     <NavWrapper>
-      <div className="flex items-center justify-center px-4 py-24 md:py-36 min-h-screen">
+      <motion.div
+        className="flex items-center justify-center px-4 py-24 md:py-36 min-h-screen"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="shadow-xl shadow-gray-500 p-4 md:p-8 text-slate-800 w-full max-w-[500px] text-center flex flex-col gap-6 md:gap-8 rounded-xl animate-slideIn">
           <h1 className="font-bold text-3xl md:text-5xl">Sign Up</h1>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 md:gap-6">
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {success && <p style={{ color: 'green' }}>{success}</p>}
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-4 md:gap-6"
+          >
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            {success && <p style={{ color: "green" }}>{success}</p>}
             <div className="flex flex-col text-base md:text-lg font-semibold text-start">
               <label htmlFor="surname">Surname</label>
               <input
@@ -131,8 +145,23 @@ export default function SignUp() {
               </label>
             </div>
 
-            <button type="submit" className="bg-customGreen w-full py-2.5 md:py-3 font-semibold text-lg md:text-xl rounded-lg text-white">
-              Sign Up
+            <button
+              type="submit"
+              className={`bg-customGreen w-full py-2.5 md:py-3 font-semibold text-lg md:text-xl rounded-lg text-white${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-customGreen hover:bg-green-600"
+              }`}
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="flex justify-center items-center space-x-2 text-white">
+                  <Loader2 className="animate-spin" />
+                  <span>Signing up...</span>
+                </div>
+              ) : (
+                <p className="text-white">Sign Up</p>
+              )}
             </button>
           </form>
 
@@ -143,7 +172,7 @@ export default function SignUp() {
             </Link>
           </p>
         </div>
-      </div>
+      </motion.div>
     </NavWrapper>
   );
 }
