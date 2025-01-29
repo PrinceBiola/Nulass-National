@@ -36,6 +36,16 @@ export default function SignUp() {
     }
   };
 
+  useEffect(() => {
+    if (success || error) {
+      const timer = setTimeout(() => {
+        setSuccess("");
+        setError("");
+      }, 3000);
+      return () => clearTimeout(timer); 
+    }
+  }, [success, error]);
+
   return (
     <NavWrapper>
       <div className="flex items-center justify-center px-4 py-24 md:py-36 min-h-screen">

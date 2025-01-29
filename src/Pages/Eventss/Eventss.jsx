@@ -25,14 +25,18 @@ function Eventss() {
   }, []);
 
 
-  const filteredEvents = events.filter(event => {
-    const matchesFilter =
-      activeFilter === 'all' || event.category === activeFilter || event.status === activeFilter;
-    const matchesSearch =
-      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+  // const filteredEvents = events.filter(event => {
+  //   const matchesFilter =
+  //     activeFilter === 'all' || event.category === activeFilter || event.status === activeFilter;
+  //   const matchesSearch =
+  //     event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     event.description.toLowerCase().includes(searchQuery.toLowerCase());
+  //   return matchesFilter && matchesSearch;
+  // });
+
+  const categories = ["all", ...new Set(events.map((events) => events.category))];
+
+  const Filteredevents  = activeFilter === "all" ? events : events.filter(event => event.category === activeFilter)
 
   return (
     <NavWrapper>
@@ -63,7 +67,7 @@ function Eventss() {
 
               {/* Filter Buttons */}
               <div className="flex flex-wrap gap-2">
-                {['all', 'upcoming', 'cultural', 'academic', 'leadership', 'social'].map(category => (
+                {categories.map(category => (
                   <button
                     key={category}
                     onClick={() => setActiveFilter(category)}
@@ -82,7 +86,7 @@ function Eventss() {
 
           {/* Events Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredEvents.map((event, index) => (
+            {Filteredevents.map((event, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -115,11 +119,11 @@ function Eventss() {
                   <div className="space-y-2 text-sm text-gray-500 mb-4">
                     <div className="flex items-center gap-2">
                       <FaCalendarAlt className="text-green-500" />
-                      <span>{event.date}</span>
+                      <span>{event.date.toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <FaClock className="text-green-500" />
-                      <span>{event.time}</span>
+                      <span>{event.time.toLocaleTimeString()}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <FaMapMarkerAlt className="text-green-500" />
@@ -136,7 +140,7 @@ function Eventss() {
           </div>
 
           {/* No Results Message */}
-          {filteredEvents.length === 0 && !error && (
+          {Filteredevents.length === 0 && !error && (
             <div className="text-center py-12">
               <p className="text-gray-600 text-lg">
                 No events found matching your criteria.

@@ -192,6 +192,7 @@ import Login from "./Pages/Auth/Login";
 import SignUp from "./Pages/Auth/SignUp";
 import Contact from "./Pages/Contact/Contact";
 import Blog from "./Pages/Blog/Blog";
+import BlogDetails from './Pages/Blog/BlogDetails'
 import About from "./Pages/About/About";
 import Applications from "./Pages/Apply/Apply";
 import Eventss from "./Pages/Eventss/Eventss";
@@ -238,6 +239,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/apply" element={<Applications />} />
           <Route path="/events" element={<Eventss />} />

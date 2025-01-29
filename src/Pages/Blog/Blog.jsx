@@ -6,18 +6,17 @@ import { Link } from "react-router-dom";
 import Blog1 from "../../assets/Images/Blog1.jpeg";
 import { fetchPosts } from "../../api/blog";
 
-
 export default function Blog() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [posts, setPosts] = useState([]);
-  const [error, setError ] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadPosts = async () => {
       try {
         const fetchedPosts = await fetchPosts();
         setPosts(fetchedPosts);
-        console.log("post",fetchedPosts )
+        console.log("post", fetchedPosts);
       } catch (error) {
         setError("Failed to fetch posts.");
       }
@@ -27,7 +26,10 @@ export default function Blog() {
 
   const categories = ["all", ...new Set(posts.map((post) => post.category))];
 
-  const Filteredpost  = activeCategory === "all" ? posts : posts.filter(post => post.category === activeCategory)
+  const Filteredpost =
+    activeCategory === "all"
+      ? posts
+      : posts.filter((post) => post.category === activeCategory);
 
   // const categories = [
   //   { id: 'all', name: 'All Posts' },
@@ -177,9 +179,12 @@ export default function Blog() {
                         {new Date(post.postTime).toLocaleTimeString()}
                       </span>
                     </div>
-                    <h3 className="text-xl font-bold mb-3 hover:text-customGreen transition-colors">
+                    <Link
+                      to={`/blog/${post._id}`}
+                      className="text-xl font-bold mb-3 hover:text-customGreen transition-colors"
+                    >
                       {post.title}
-                    </h3>
+                    </Link>
                     <p className="text-gray-600 mb-4">{post.excerpt}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-customGreen bg-green-50 px-3 py-1 rounded-full">

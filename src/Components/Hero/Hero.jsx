@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import HeroBg from '../../assets/Images/Blog1.jpeg'; // Make sure to add this image
+import HeroBg from '../../assets/Images/Banner.jpg'; // Make sure to add this image
 import { motion } from 'framer-motion'; // Optional: for animations
 
 function Hero() {

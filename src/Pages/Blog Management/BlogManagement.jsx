@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { fetchPosts, createPost, updatePost, deletePost } from "../../api/blog";
-import { FiPlusCircle } from "react-icons/fi"; // Add this import for a plus icon
+import { FiPlusCircle } from "react-icons/fi";
 import AddBlogModal from "../../Components/Modals/AddBlogModal";
 
 function BlogManagement() {
@@ -25,6 +25,17 @@ function BlogManagement() {
     loadPosts();
   }, []);
 
+  
+  useEffect(() => {
+    if (success || error) {
+      const timer = setTimeout(() => {
+        setSuccess("");
+        setError("");
+      }, 3000);
+      return () => clearTimeout(timer); 
+    }
+  }, [success, error]);
+
   const handleDeletePost = async (postId) => {
     try {
       await deletePost(postId);
@@ -48,6 +59,7 @@ function BlogManagement() {
         </button>
       </div>
 
+      {/* Success & Error Messages with Timer */}
       {error && <p className="text-red-500">{error}</p>}
       {success && <p className="text-green-500">{success}</p>}
 
@@ -104,8 +116,6 @@ function BlogManagement() {
           onClose={() => setIsModalOpen(false)}
         />
       )}
-
-
     </div>
   );
 }

@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
 import { createPost } from "../../api/blog";
 import SammyModal from "../General/SammyModal";
-import { MdOutlineCameraAlt } from "react-icons/md"; // Ensure you have this icon installed
+import { MdOutlineCameraAlt } from "react-icons/md"; 
+import Editor from 'react-simple-wysiwyg';
 
 const AddBlogModal = ({ isOpen, onClose }) => {
   const { token } = useAuthContext();
@@ -37,6 +38,13 @@ const AddBlogModal = ({ isOpen, onClose }) => {
     }
   };
 
+  // const handleEditorChange = (value) => {
+  //   setForm((prevForm) => ({
+  //     ...prevForm,
+  //     description: value,
+  //   }));
+  // };
+
   const validate = () => {
     if (
       form.title !== "" &&
@@ -61,8 +69,8 @@ const AddBlogModal = ({ isOpen, onClose }) => {
     setLoading(true);
 
     try {
-      // Simulate creating a new post
-      const createdPost = await createPost(form);  // Use your actual API call here
+      
+      const createdPost = await createPost(form);  
       setForm({
         title: "",
         description: "",
@@ -157,14 +165,10 @@ const AddBlogModal = ({ isOpen, onClose }) => {
 
           <div>
             <p className="text-gray-600 mb-2 text-sm">Blog Description</p>
-            <textarea
-              name="description"
-              value={form.description}
-              onChange={handleFormChange}
-              className="border rounded-lg py-2 px-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter blog description"
-              rows="4"
-            />
+            
+            <Editor containerProps={{ style: { height: '1000px' } }} name="description" value={form.description} onChange={handleFormChange} />
+
+            
           </div>
         </div>
 

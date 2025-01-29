@@ -10,6 +10,7 @@ function Events() {
     time: '',
     location: '',
     description: '',
+    category: '',
     image: '',
     author: "",
   });
@@ -101,6 +102,13 @@ function Events() {
               className="border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               value={newEvent.author}
               onChange={(e) => setNewEvent({ ...newEvent, author: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Category"
+              className="border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              value={newEvent.category}
+              onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
             />
             <textarea
               placeholder="Description"
