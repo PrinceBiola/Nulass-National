@@ -62,6 +62,10 @@ router.post('/register', async (req, res) => {
     }
 });
 
+
+
+
+
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -72,7 +76,7 @@ router.post('/login', async (req, res) => {
         if (!user) {
             return res.status(401).json({ 
                 success: false,
-                message: 'Invalid credentials' 
+                message: 'User doesnt exixt' 
             });
         }
         const isMatch = await bcrypt.compare(password, user.password);

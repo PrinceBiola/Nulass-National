@@ -318,36 +318,7 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Recent Activities with enhanced styling */}
-      <div className="bg-white rounded-xl shadow-sm">
-        <div className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Recent Activities</h2>
-          <div className="space-y-4">
-            {recentActivities.map((activity, index) => (
-              <div
-                key={index}
-                className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-              >
-                <div className="flex-shrink-0">
-                  <div className={`p-2 rounded-full ${
-                    activity.type === 'user' ? 'bg-blue-100' :
-                    activity.type === 'blog' ? 'bg-green-100' :
-                    'bg-purple-100'
-                  }`}>
-                    {activity.type === 'user' && <FaUsers className="w-5 h-5 text-blue-600" />}
-                    {activity.type === 'blog' && <FaBlog className="w-5 h-5 text-green-600" />}
-                    {activity.type === 'event' && <FaCalendarAlt className="w-5 h-5 text-purple-600" />}
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <p className="text-gray-800 font-medium">{activity.message}</p>
-                  <p className="text-sm text-gray-500 mt-1">{activity.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 }

@@ -60,24 +60,24 @@ function DashboardLayout({ children }) {
       bgColor: "from-green-400 to-green-600"
     },
     { path: "/dashboard/blog", icon: FaBlog, label: "Blog Management", roles: ["admin"] , bgColor: "from-green-400 to-green-600"},
-    { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", "normal_user", "institution"] , bgColor: "from-green-400 to-green-600"},
+    { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin",, "institution"] , bgColor: "from-green-400 to-green-600"},
     { path: "/dashboard/finance", icon: FaMoneyBillWave, label: "Financials", roles: ["admin", "superadmin"] , bgColor: "from-green-400 to-green-600"},
     { path: "/dashboard/analytics", icon: FaChartBar, label: "Analytics", roles: ["admin", "normal_user"] },
     { path: "/dashboard/messages", icon: FaEnvelope, label: "Communication", roles: ["admin"] , bgColor: "from-green-400 to-green-600"},
     { path: "/dashboard/settings", icon: FaCog, label: "Settings", roles: ["admin"] , bgColor: "from-green-400 to-green-600"},
     { path: "/profile", icon: FaUserCircle, label: "Profile", roles: ["admin", "normal_user", "institution", "superadmin"] , bgColor: "from-green-400 to-green-600"},
-    { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", "normal_user", "institution"] },
+    // { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", "normal_user", "institution"] },
   ];
 
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 ">
       <aside
         className={`fixed top-0 left-0 z-40 h-screen transition-transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } bg-white shadow-xl w-72`}
       >
-        {/* Logo Section */}
+    
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <Link to="/" className="flex items-center space-x-3">
             <img src={Logo} alt="NULASS Logo" className="h-10 w-10" />

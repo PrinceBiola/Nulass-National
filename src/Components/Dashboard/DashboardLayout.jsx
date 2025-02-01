@@ -13,7 +13,6 @@
           </ul>
         </div>
 
-        {/* Content Management Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold mb-4 bg-red-500">Content Management</h2>
           <ul className="list-disc pl-5 space-y-2">

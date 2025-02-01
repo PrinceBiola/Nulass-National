@@ -87,7 +87,6 @@ router.get('/users', async (req, res) => {
     }
 });
 
-// Fetch a single blog
 router.get('/blogs/:id', async (req, res) => {
     try {
         const blog = await Blog.findById(req.params.id);
@@ -364,5 +363,39 @@ router.post('/verify-payment', protect, async (req, res) => {
   });
   
 
+router.get('/financials', protect, admin, async (req, res) => {
+    try {
+        const applications = await Application.find().populate('user');
+        const totalIncome = applications.reduce((acc, app) => acc + (app.paymentStatus === 'paid' ? app.amount : 0), 0);
+        const pendingPayments = applications.filter(app => app.paymentStatus === 'unpaid').length;
+
+        res.status(200).json({\                                                 
+            totalIncome,
+            pendingPayments,
+            applications: applications.map(app => ({
+                _id: app._id,
+                user: app.user,
+                firstName: app.firstName,
+                lastName: app.lastName,
+                email: app.email,
+                phoneNumber: app.phoneNumber,
+                institution: app.institution,
+                department: app.department,
+                level: app.level,
+                matricNumber: app.matricNumber,
+                address: app.address,
+                lgaOfOrigin: app.lgaOfOrigin,
+                stateOfResidence: app.stateOfResidence,
+                status: app.status,
+                createdAt: app.createdAt,
+                updatedAt: app.updatedAt,
+                paymentStatus: app.paymentStatus,
+                amount: app.amount
+            })),
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 module.exports = router;

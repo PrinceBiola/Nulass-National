@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
-import { useAuthContext } from '../../context/AuthContext';
 
 const FinancialManagement = () => {
-  const { token } = useAuthContext();
     const [financialData, setFinancialData] = useState({ totalIncome: 0, pendingPayments: 0, applications: [] });
 
     useEffect(() => {
         const fetchFinancialData = async () => {
-            const response = await axios.get('http://localhost:5000/api/financials', { headers: { Authorization: `Bearer ${token}` } });
+            const response = await axios.get('/api/financials', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
             setFinancialData(response.data);
         };
         fetchFinancialData();
