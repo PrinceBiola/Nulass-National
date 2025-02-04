@@ -369,7 +369,7 @@ router.get('/financials', protect, admin, async (req, res) => {
         const totalIncome = applications.reduce((acc, app) => acc + (app.paymentStatus === 'paid' ? app.amount : 0), 0);
         const pendingPayments = applications.filter(app => app.paymentStatus === 'unpaid').length;
 
-        res.status(200).json({\                                                 
+        res.status(200).json({                                             
             totalIncome,
             pendingPayments,
             applications: applications.map(app => ({
