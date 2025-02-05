@@ -1,11 +1,21 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_SERVER_URL + '/api';
 
 // Fetch all blog posts
 export const fetchPosts = async () => {
     try {
         const response = await axios.get(`${API_URL}/blogs`);
+        return response.data; 
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        throw error; 
+    }
+};
+export const fetchCourse = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/course`);
+        console.log("response farrr", response)
         return response.data; 
     } catch (error) {
         console.error('Error fetching posts:', error);

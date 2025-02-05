@@ -6,6 +6,7 @@ const ApplicationSchema = mongoose.Schema({
   lastName: { type: String, required: true },
   email: { type: String, required: true },
   phoneNumber: { type: String, required: true },
+  NIN: { type: String, required: true },
   institution: { type: String, required: true },
   department: { type: String, required: true },
   level: { type: String, required: true },

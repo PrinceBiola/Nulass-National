@@ -10,6 +10,8 @@ import {
   FaEnvelope,
   FaCog,
   FaUserCircle,
+  FaIdCard,
+  FaUserAlt,
 } from "react-icons/fa";
 
 import Logo from "../../assets/Images/Logo.png";
@@ -35,38 +37,38 @@ function DashboardLayout({ children }) {
       path: "/dashboard", 
       icon: FaHome, 
       label: "Dashboard", 
-      roles: ["admin", "normal_user", "superadmin"],
+      roles: ["admin", "student", "superadmin", "intitution"],
       bgColor: "from-blue-400 to-blue-600"
     },
     { 
       path: "/application", 
-      icon: FaHome, 
+      icon: FaUserAlt, 
       label: "Application", 
-      roles: ["normal_user"],
+      roles: ["student", "institution"],
       bgColor: "from-purple-400 to-purple-600"
     },
     { 
       path: "/idcard", 
-      icon: FaHome, 
+      icon: FaIdCard, 
       label: "ID Card", 
-      roles: ["normal_user"],
+      roles: ["student"],
       bgColor: "from-pink-400 to-pink-600"
     },
     { 
       path: "/dashboard/users", 
       icon: FaUsers, 
-      label: "User Management", 
+      label: "Member Management", 
       roles: ["admin"],
       bgColor: "from-green-400 to-green-600"
     },
     { path: "/dashboard/blog", icon: FaBlog, label: "Blog Management", roles: ["admin"] , bgColor: "from-green-400 to-green-600"},
     { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin",, "institution"] , bgColor: "from-green-400 to-green-600"},
     { path: "/dashboard/finance", icon: FaMoneyBillWave, label: "Financials", roles: ["admin", "superadmin"] , bgColor: "from-green-400 to-green-600"},
-    { path: "/dashboard/analytics", icon: FaChartBar, label: "Analytics", roles: ["admin", "normal_user"] },
+    { path: "/dashboard/analytics", icon: FaChartBar, label: "Analytics", roles: ["admin", "student"] },
     { path: "/dashboard/messages", icon: FaEnvelope, label: "Communication", roles: ["admin"] , bgColor: "from-green-400 to-green-600"},
     { path: "/dashboard/settings", icon: FaCog, label: "Settings", roles: ["admin"] , bgColor: "from-green-400 to-green-600"},
-    { path: "/profile", icon: FaUserCircle, label: "Profile", roles: ["admin", "normal_user", "institution", "superadmin"] , bgColor: "from-green-400 to-green-600"},
-    // { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", "normal_user", "institution"] },
+    { path: "/profile", icon: FaUserCircle, label: "Profile", roles: ["admin", "student", "institution", "superadmin"] , bgColor: "from-green-400 to-green-600"},
+    // { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", "student", "institution"] },
   ];
 
 

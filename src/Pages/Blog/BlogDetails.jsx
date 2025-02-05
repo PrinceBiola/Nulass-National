@@ -4,7 +4,7 @@ import NavWrapper from "../../Components/NavWrapper";
 import { formatDate } from "../../Helper/helper";
 
 const BlogDetails = () => {
-  const { id } = useParams(); // Get blog ID from the URL
+  const { id } = useParams();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FaQuoteLeft } from 'react-icons/fa';
-import Student1 from '../../assets/Images/Blog1.jpeg'; // Add student images
+import Student1 from '../../assets/Images/Blog1.jpeg';
 
 function Testimonial() {
   const testimonials = [
@@ -31,7 +31,7 @@ function Testimonial() {
   return (
     <section className="py-16 md:py-24 px-4 md:px-8 lg:px-12">
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
+      
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -50,7 +50,7 @@ function Testimonial() {
           </p>
         </motion.div>
 
-        {/* Testimonials Grid */}
+    
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
             <motion.div
@@ -87,7 +87,7 @@ function Testimonial() {
           ))}
         </div>
 
-        {/* Additional Testimonial Stats */}
+       
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
