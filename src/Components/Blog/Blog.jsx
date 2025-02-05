@@ -3,25 +3,26 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaCalendarAlt, FaArrowRight } from "react-icons/fa";
 import axios from "axios";
+import { fetchBlogs } from "../../api/blog";
 
 function Blog() {
   const [blogPosts, setBlogPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBlogs = async () => {
+    const loadBlog = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/blogs");
-        const latestBlogs = response.data.slice(0, 3); // Get only the latest 3 blogs
-        setBlogPosts(latestBlogs);
+        const fetchedBlog = await fetchBlogs();
+        setBlogPosts(fetchedBlog);
+        console.log("blog", fetchedBlog);
       } catch (error) {
-        console.error("Error fetching blogs:", error);
+        setError("Failed to fetch blogs.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBlogs();
+    loadBlog();
   }, []);
 
   return (

@@ -2,32 +2,34 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import NavWrapper from "../../Components/NavWrapper";
 import { formatDate } from "../../Helper/helper";
+import { fetchPost } from "../../api/blog";
 
 const BlogDetails = () => {
-  const { id } = useParams(); // Get blog ID from the URL
+  const { id } = useParams(); 
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchBlog = async () => {
+    const loadBlog = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/blogs/${id}`);
-        if (!response.ok) throw new Error("Blog post not found!");
-        const data = await response.json();
-        setBlog(data);
-      } catch (err) {
-        setError(err.message);
+        const fetchedPost = await fetchPost(id);
+        setBlog(fetchedPost);
+        console.log("post", fetchedPost);
+      } catch (error) {
+        setError("Failed to fetch posts.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBlog();
+    loadBlog();
   }, [id]);
 
   if (loading) return <p className="text-center mt-10 text-lg">Loading...</p>;
   if (error) return <p className="text-center text-red-500 mt-10">{error}</p>;
+
+  if (!blog) return <p className="text-center mt-10 text-lg">No post found.</p>;
 
   return (
     <NavWrapper>
