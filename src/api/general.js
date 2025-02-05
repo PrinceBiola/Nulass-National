@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_SERVER_URL + '/api';
 
 
 export const fechUser = async () => {
@@ -15,8 +15,8 @@ export const fechUser = async () => {
 };
 
 
+// Application User  user
 
-// Register user
 export const ApplyUser = async (data, token) => {
     return await axios.post(`${API_URL}/apply`, data, {
         headers: {
@@ -25,6 +25,8 @@ export const ApplyUser = async (data, token) => {
     });
     
   };
+
+
 
 
 

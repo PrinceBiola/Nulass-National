@@ -239,7 +239,7 @@ router.delete('/users/:id', async (req, res) => {
 //   });
 
 router.post('/apply', protect, async (req, res) => {
-    const { firstName, lastName, email, phoneNumber, institution, department, level, matricNumber, address, lgaOfOrigin, stateOfResidence } = req.body;
+    const { firstName, lastName, email, phoneNumber, NIN, institution, department, level, matricNumber, address, lgaOfOrigin, stateOfResidence } = req.body;
   
     try {
       // Create a new application
@@ -249,6 +249,7 @@ router.post('/apply', protect, async (req, res) => {
         lastName,
         email,
         phoneNumber,
+        NIN,
         institution,
         department,
         level,

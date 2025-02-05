@@ -2,26 +2,28 @@ import React, { useState } from "react";
 import Logo from "../../assets/Images/Logo.png";
 import { Link } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
-// import { UserContext } from "../../Context/UserContext";
+import { useAuthContext } from "../../context/AuthContext";
 
-function Nav({ surname }) {
+
+function Nav( {surname} ) {
+
+  // const { user } = useAuthContext();
+  const { logout, user } = useAuthContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  
-  // const { surname } = useContext(UserContext);
-  console.log("Current surname:", surname);
+
 
   return (
     <div className="fixed top-0 left-0 w-full bg-white px-4 sm:px-6 md:px-8 lg:px-12 xl:px-24 py-3 md:py-4 flex items-center justify-between shadow-md z-50">
       <Link to="/">
         <div className="flex items-center gap-2 md:gap-4">
-          <img 
-            src={Logo} 
-            alt="Logo" 
-            className="w-12 sm:w-14 md:w-16 lg:w-20 transition-all" 
+          <img
+            src={Logo}
+            alt="Logo"
+            className="w-12 sm:w-14 md:w-16 lg:w-20 transition-all"
           />
           <div className="flex flex-col">
             <h4 className="font-bold text-xs sm:text-sm md:text-base lg:text-lg">
@@ -61,26 +63,43 @@ function Nav({ surname }) {
         <Link to="/apply">
           <li className="hover:text-customGreen transition-colors">Applications</li>
         </Link>
-        <Link to="/dashboard">
-          <li className="hover:text-customGreen transition-colors">Dashboard</li>
-        </Link>
+
         <div className="flex items-center gap-2 xl:gap-4">
-          {surname ? (
-            <span className="text-customGreen font-semibold">{surname}</span>
-          ) : (
-            <>
-              <Link to="/login">
+
+          <span className="text-customGreen font-semibold">{surname}</span>
+
+          <>
+            {user ? (
+              <Link to="/dashboard">
                 <button className="text-customGreen border-2 border-customGreen px-4 xl:px-6 py-1.5 xl:py-2 rounded-lg hover:bg-customGreen hover:text-white transition-all text-sm xl:text-base">
-                  Login
+                  Dashboard
                 </button>
               </Link>
+            ) :
+              (
+                <Link to="/login">
+                  <button className="text-customGreen border-2 border-customGreen px-4 xl:px-6 py-1.5 xl:py-2 rounded-lg hover:bg-customGreen hover:text-white transition-all text-sm xl:text-base">
+                    Login
+                  </button>
+                </Link>
+              )
+            }
+            {user ? (
+           
+                <button className="bg-customGreen text-white px-4 xl:px-6 py-1.5 xl:py-2 rounded-lg hover:bg-opacity-90 transition-all text-sm xl:text-base" onClick={logout}>
+                  Logout
+                </button>
+             
+            ) : (
               <Link to="/signup">
                 <button className="bg-customGreen text-white px-4 xl:px-6 py-1.5 xl:py-2 rounded-lg hover:bg-opacity-90 transition-all text-sm xl:text-base">
                   Sign Up
                 </button>
               </Link>
-            </>
-          )}
+            )}
+
+          </>
+
         </div>
       </ul>
 

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { fechUser } from '../../api/general'; 
 import { deleteuser } from '../../api/auth';
+import { FaEdit } from 'react-icons/fa';
 
 function UserManagemnt() {
   const [members, setMembers] = useState([]);
@@ -112,11 +113,20 @@ function UserManagemnt() {
                 <td className="px-6 py-4 whitespace-nowrap">{member.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{member.email}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{member.role}</td>
+                
                 <td className="px-6 py-4 whitespace-nowrap">
                   {member.deleted ? (
                     <span className="text-gray-400">Deleted</span>
                   ) : (
                     <button onClick={() => handleDeleteUser(member._id)} className="text-red-600 ml-4">Delete</button>
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {member.edited ? (
+                    <span className="text-gray-400">Updated</span>
+                  ) : (
+                    <FaEdit />
+                    // <button onClick={() => handleDeleteUser(member._id)} className="text-green-600 ml-4">Update</button>
                   )}
                 </td>
               </tr>
