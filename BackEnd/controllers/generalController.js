@@ -10,6 +10,8 @@ require('dotenv').config();
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
 const { verifyPayment } = require('../utils/paystack');
+const multer = require('multer'); // Add multer for file uploads
+
 // Create a new blog
 
 
@@ -211,73 +213,61 @@ router.delete('/users/:id', async (req, res) => {
     }
 });
 
-// router.post('/apply', protect, async (req, res) => {
-//     const { firstName, lastName, email, phoneNumber, institution, department, level, matricNumber, address, lgaOfOrigin, stateOfResidence } = req.body;
-//     try {
-//       const application = await Application.create({
-//         user: req.user._id,
-//         firstName,
-//         lastName,
-//         email,
-//         phoneNumber,
-//         institution,
-//         department,
-//         level,
-//         matricNumber,
-//         address,
-//         lgaOfOrigin,
-//         stateOfResidence,
-//       });
-  
-//       req.user.role = 'application_user';
-//       await req.user.save();
-  
-//       res.status(201).json(application);
-//     } catch (error) {
-//       res.status(500).json({ message: error.message });
-//     }
-//   });
+// Configure multer for image uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // This should point to the uploads directory
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  },
+});
 
-router.post('/apply', protect, async (req, res) => {
+const upload = multer({ storage });
+
+// Update the apply route to handle image uploads
+router.post('/apply', protect, upload.single('image'), async (req, res) => {
     const { firstName, lastName, email, phoneNumber, NIN, institution, department, level, matricNumber, address, lgaOfOrigin, stateOfResidence } = req.body;
-  
+
     try {
-      // Create a new application
-      const application = new Application({
-        user: req.user._id,
-        firstName,
-        lastName,
-        email,
-        phoneNumber,
-        NIN,
-        institution,
-        department,
-        level,
-        matricNumber,
-        address,
-        lgaOfOrigin,
-        stateOfResidence,
-      });
-  
-      // Save the application
-      await application.save();
-  
-      // Create an order with payment status 'unpaid'
-      const order = new Order({
-        user: req.user._id,
-        application: application._id, // link the order to the application
-        paymentStatus: 'unpaid', // default payment status
-        reference: null, // Placeholder for now, to be filled after payment verification
-      });
-  
-      // Save the order
-      await order.save();
-  
-      res.status(201).json({ message: 'Application and order created successfully!', application });
+        // Check if the file was uploaded
+        if (!req.file) {
+            return res.status(400).json({ message: 'Image file is required' });
+        }
+
+        const application = new Application({
+            user: req.user._id,
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            NIN,
+            institution,
+            department,
+            level,
+            matricNumber,
+            address,
+            lgaOfOrigin,
+            stateOfResidence,
+            image: req.file.path, // Access the file path
+        });
+
+        await application.save();
+
+        const order = new Order({
+            user: req.user._id,
+            application: application._id,
+            paymentStatus: 'unpaid',
+            reference: null,
+        });
+
+        await order.save();
+
+        res.status(201).json({ message: 'Application and order created successfully!', application });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
-  });
+});
   
 
 

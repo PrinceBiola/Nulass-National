@@ -51,14 +51,7 @@ const UploadImage = ({ userData, setUserData, nextStep, prevStep }) => {
           <img src={imageURL} alt="Uploaded" />
         </div>
       )}
-      <Group position="center" mt={"xl"}>
-        <Button variant="default" onClick={prevStep}>
-          Back
-        </Button>
-        <Button onClick={handleNext} disabled={!imageURL}>
-          Next
-        </Button>
-      </Group>
+  
     </div>
   );
 };

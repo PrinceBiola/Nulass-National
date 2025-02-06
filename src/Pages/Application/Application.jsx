@@ -3,14 +3,19 @@ import React, { useState } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
 import PaystackButton from '../../Components/PaystackButton';
 import { ApplyUser } from '../../api/general';
-
+import UploadFormInput from '../../Components/UploadFormInput/UploadFormInput';
+import UploadFormTextarea from '../../Components/UploadFormInput/UploadFormTextarea';
+// import PaymentModal from './PaymentModal';
+import { toast } from 'react-toastify';
+import PaymentModal from '../../Components/PaymentModal';
 
 const ApplicationForm = () => {
-  const { token } = useAuthContext();
+  const { token, user } = useAuthContext();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '',
+    email: user?.email || '',
     phoneNumber: '',
     NIN: '',
     institution: '',
@@ -20,345 +25,249 @@ const ApplicationForm = () => {
     address: '',
     lgaOfOrigin: '',
     stateOfResidence: '',
+    image: '',
   });
 
-  const [application, setApplication] = useState(null); // Store application details after submission
+  const [application, setApplication] = useState(null);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (name, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const response = await axios.post('/apply', formData, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-//       alert('Application submitted successfully!');
-//       setApplication(response.data);
-//     } catch (error) {
-//       console.error(error.response.data);
-//       alert('Error submitting application!');
-//     }
-//   };
-
-console.log("token", token)
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-        const response = await ApplyUser(formData, token);
-      alert('Application submitted successfully!');
-      setApplication(response.data); 
-    } catch (error) {
-      console.error(error.response?.data || error.message);
-      alert('Error submitting application!');
+  const uploadImage = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, image: reader.result });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-md">
-      <h1 className="text-2xl font-bold mb-4">Apply for ID</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {Object.keys(formData).map((field) => (
-          <div key={field}>
-            <label className="block text-sm font-medium capitalize">{field}</label>
-            <input
-              type="text"
-              name={field}
-              value={formData[field]}
-              onChange={handleChange}
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-        ))}
-        <button
-          type="submit"
-          className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
-        >
-          Submit
-        </button>
-      </form>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach(key => {
+        formDataToSend.append(key, formData[key]);
+      });
 
-      {application && (
-        <div className="mt-6">
-          <h2 className="text-xl font-bold mb-2">Proceed to Payment</h2>
-          <PaystackButton
-            amount={5000}
-            orderId={application._id}
-            onSuccess={(data) => {
-              alert('Payment successful!');
-              console.log(data);
-            }}
-          />
+      const imageFile = document.getElementById('imageUpload').files[0];
+      if (imageFile) {
+        formDataToSend.append('image', imageFile);
+      }
+
+      const response = await ApplyUser(formDataToSend, token);
+      setShowPaymentModal(true);
+    } catch (error) {
+      toast.error('Error submitting application!');
+    }
+  };
+
+  const closeModal = () => {
+    setSuccess(false);
+    setError(null);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
+        <div className="p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Student ID Application</h1>
+            <p className="mt-2 text-gray-600">Please fill in your details accurately</p>
+          </div>
+
+          {/* Application Progress Indicator */}
+          <div className="mb-8">
+            <div className="flex items-center justify-center space-x-12">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white">
+                  1
+                </div>
+                <span className="mt-2 text-sm">Personal Info</span>
+              </div>
+              <div className="flex-1 h-1 bg-gray-200">
+                <div className="h-full bg-green-500 w-1/3"></div>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                  2
+                </div>
+                <span className="mt-2 text-sm">Payment</span>
+              </div>
+              <div className="flex-1 h-1 bg-gray-200"></div>
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                  3
+                </div>
+                <span className="mt-2 text-sm">Confirmation</span>
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
+            <div className="space-y-6 p-6">
+              {/* Image Upload Section */}
+              <div className="relative group">
+                <input
+                  type="file"
+                  onChange={uploadImage}
+                  className="hidden"
+                  id="imageUpload"
+                  accept="image/*"
+                />
+                <label
+                  htmlFor="imageUpload"
+                  className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all"
+                >
+                  {formData.image ? (
+                    <div className="relative w-full h-full">
+                      <img
+                        src={formData.image}
+                        alt="Upload preview"
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <svg className="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      <p className="text-sm text-gray-500">Click to upload your photo</p>
+                    </div>
+                  )}
+                </label>
+              </div>
+
+              {/* Input Fields */}
+              <UploadFormInput
+                label="First Name"
+                placeholder="Enter your first name"
+                value={formData.firstName}
+                onChange={(e) => handleChange('firstName', e.target.value)}
+                name="firstName"
+                required
+              />
+              <UploadFormInput
+                label="Last Name"
+                placeholder="Enter your last name"
+                value={formData.lastName}
+                onChange={(e) => handleChange('lastName', e.target.value)}
+                name="lastName"
+                required
+              />
+              <UploadFormInput
+                label="Email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={(e) => handleChange('email', e.target.value)}
+                name="email"
+                required
+              />
+              <UploadFormInput
+                label="Phone Number"
+                placeholder="Enter your phone number"
+                value={formData.phoneNumber}
+                onChange={(e) => handleChange('phoneNumber', e.target.value)}
+                name="phoneNumber"
+                required
+              />
+              <UploadFormInput
+                label="NIN"
+                placeholder="Enter your NIN"
+                value={formData.NIN}
+                onChange={(e) => handleChange('NIN', e.target.value)}
+                name="NIN"
+                required
+              />
+              <UploadFormInput
+                label="Institution"
+                placeholder="Enter your institution"
+                value={formData.institution}
+                onChange={(e) => handleChange('institution', e.target.value)}
+                name="institution"
+                required
+              />
+              <UploadFormInput
+                label="Department"
+                placeholder="Enter your department"
+                value={formData.department}
+                onChange={(e) => handleChange('department', e.target.value)}
+                name="department"
+                required
+              />
+              <UploadFormInput
+                label="Level"
+                placeholder="Enter your level"
+                value={formData.level}
+                onChange={(e) => handleChange('level', e.target.value)}
+                name="level"
+                required
+              />
+              <UploadFormInput
+                label="Matric Number"
+                placeholder="Enter your matric number"
+                value={formData.matricNumber}
+                onChange={(e) => handleChange('matricNumber', e.target.value)}
+                name="matricNumber"
+                required
+              />
+              <UploadFormInput
+                label="Address"
+                placeholder="Enter your address"
+                value={formData.address}
+                onChange={(e) => handleChange('address', e.target.value)}
+                name="address"
+                required
+              />
+              <UploadFormInput
+                label="LGA of Origin"
+                placeholder="Enter your LGA of origin"
+                value={formData.lgaOfOrigin}
+                onChange={(e) => handleChange('lgaOfOrigin', e.target.value)}
+                name="lgaOfOrigin"
+                required
+              />
+              <UploadFormInput
+                label="State of Residence"
+                placeholder="Enter your state of residence"
+                value={formData.stateOfResidence}
+                onChange={(e) => handleChange('stateOfResidence', e.target.value)}
+                name="stateOfResidence"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
+            >
+              Submit
+            </button>
+          </form>
         </div>
-      )}
+      </div>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        applicationData={formData}
+      />
     </div>
   );
 };
 
 export default ApplicationForm;
-// import React, { useState } from 'react';
-// import axios from 'axios';
-// import { useAuthContext } from '../../context/AuthContext';
-// import PaystackButton from '../../Components/PaystackButton';
-// import { ApplyUser } from '../../api/general';
-
-// const ApplicationForm = () => {
-//     const { token } = useAuthContext();
-//     const [formData, setFormData] = useState({
-//         firstName: '',
-//         lastName: '',
-//         email: '',
-//         phoneNumber: '',
-//         institution: '',
-//         department: '',
-//         level: '',
-//         matricNumber: '',
-//         address: '',
-//         lgaOfOrigin: '',
-//         stateOfResidence: '',
-//     });
-
-//     const [application, setApplication] = useState(null);
-
-//     const handleChange = (e) => {
-//         setFormData({ ...formData, [e.target.name]: e.target.value });
-//     };
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         try {
-//             const response = await ApplyUser(formData, token);
-//             alert('Application submitted successfully!');
-//             setApplication(response.data);
-//             setFormData({
-//                 firstName: '',
-//                 lastName: '',
-//                 email: '',
-//                 phoneNumber: '',
-//                 institution: '',
-//                 department: '',
-//                 level: '',
-//                 matricNumber: '',
-//                 address: '',
-//                 lgaOfOrigin: '',
-//                 stateOfResidence: '',
-//             });
-//         } catch (error) {
-//             console.error(error.response?.data || error.message);
-//             alert('Error submitting application!');
-//         }
-//     };
-
-//     return (
-//         <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-//             <h1 className="text-3xl font-bold mb-4 text-green-600">Apply for ID</h1>
-//             {!application ? (
-//                 <form onSubmit={handleSubmit} className="space-y-6">
-//                     {Object.keys(formData).map((field) => (
-//                         <div key={field}>
-//                             <label className="block text-sm font-semibold capitalize text-gray-700">
-//                                 {field.replace(/([A-Z])/g, ' $1')}
-//                             </label>
-//                             <input
-//                                 type="text"
-//                                 name={field}
-//                                 value={formData[field]}
-//                                 onChange={handleChange}
-//                                 className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-//                                 required
-//                             />
-//                         </div>
-//                     ))}
-//                     <button
-//                         type="submit"
-//                         className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-all"
-//                     >
-//                         Submit
-//                     </button>
-//                 </form>
-//             ) : (
-//                 <div className="mt-6">
-//                     <h2 className="text-xl font-bold text-green-500">Application Details</h2>
-//                     <ul className="text-gray-700 space-y-2">
-//                         {Object.entries(application).map(([key, value]) => (
-//                             <li key={key}>
-//                                 <span className="font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1')}: </span>
-//                                 {value}
-//                             </li>
-//                         ))}
-//                     </ul>
-//                     <div className="mt-4 flex justify-end space-x-4">
-//                         <button
-//                             className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
-//                             onClick={() => {
-//                                 alert('You can pay later.');
-//                                 window.location.href = "/my-order"; // Navigate to the 'my-order' page
-//                             }}
-//                         >
-//                             Pay Later
-//                         </button>
-//                         <PaystackButton
-//                             amount={5000}
-//                             orderId={application._id}
-//                             onSuccess={(data) => {
-//                                 alert('Payment successful!');
-//                                 console.log("data from paystack", data);
-//                             }}
-//                         />
-//                     </div>
-//                 </div>
-//             )}
-//         </div>
-//     );
-// };
-
-// export default ApplicationForm;
-// // import React, { useState } from 'react';
-// // import axios from 'axios';
-// // import { useAuthContext } from '../../context/AuthContext';
-// // import PaystackButton from '../../Components/PaystackButton';
-// // import { ApplyUser } from '../../api/general';
-
-// // const ApplicationForm = () => {
-// //     const { token } = useAuthContext();
-// //     const [formData, setFormData] = useState({
-// //         firstName: '',
-// //         lastName: '',
-// //         email: '',
-// //         phoneNumber: '',
-// //         institution: '',
-// //         department: '',
-// //         level: '',
-// //         matricNumber: '',
-// //         address: '',
-// //         lgaOfOrigin: '',
-// //         stateOfResidence: '',
-// //     });
-
-// //     const [application, setApplication] = useState(null);
-// //     console.log("aplication here ",application)
-
-// //     const handleChange = (e) => {
-// //         setFormData({ ...formData, [e.target.name]: e.target.value });
-// //     };
-
-// //     const handleSubmit = async (e) => {
-// //         e.preventDefault();
-// //         try {
-// //             const response = await ApplyUser(formData, token);
-// //             alert('Application submitted successfully!');
-// //             console.log("response data for aplication",response)
-// //             setApplication(response.data.data.application);
-// //             setFormData({
-// //                 firstName: '',
-// //                 lastName: '',
-// //                 email: '',
-// //                 phoneNumber: '',
-// //                 institution: '',
-// //                 department: '',
-// //                 level: '',
-// //                 matricNumber: '',
-// //                 address: '',
-// //                 lgaOfOrigin: '',
-// //                 stateOfResidence: '',
-// //             });
-// //         } catch (error) {
-// //             // console.error(error.response?.message || error.message);
-// //             alert('Error submitting application!');
-// //         }
-// //     };
-
-// //     return (
-// //         <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-// //             <h1 className="text-3xl font-bold mb-4 text-green-600">Apply for ID</h1>
-// //             {!application ? (
-// //                 <form onSubmit={handleSubmit} className="space-y-6">
-// //                     {Object.keys(formData).map((field) => (
-// //                         <div key={field}>
-// //                             <label className="block text-sm font-semibold capitalize text-gray-700">
-// //                                 {field.replace(/([A-Z])/g, ' $1')}
-// //                             </label>
-// //                             <input
-// //                                 type="text"
-// //                                 name={field}
-// //                                 value={formData[field]}
-// //                                 onChange={handleChange}
-// //                                 className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-// //                                 required
-// //                             />
-// //                         </div>
-// //                     ))}
-// //                     <button
-// //                         type="submit"
-// //                         className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-all"
-// //                     >
-// //                         Submit
-// //                     </button>
-// //                 </form>
-// //             ) : (
-// //                 <div className="mt-6">
-// //                     <h2 className="text-xl font-bold text-green-500">Application Details</h2>
-// //                     <div className="text-gray-700 space-y-4">
-// //                         <div>
-// //                             <span className="font-semibold">First Name: </span>{application.firstName}
-// //                         </div>
-// //                         <div>
-// //                             <span className="font-semibold">Last Name: </span>{application.lastName}
-// //                         </div>
-// //                         <div>
-// //                             <span className="font-semibold">Email: </span>{application.email}
-// //                         </div>
-// //                         <div>
-// //                             <span className="font-semibold">Phone Number: </span>{application.phoneNumber}
-// //                         </div>
-// //                         <div>
-// //                             <span className="font-semibold">Institution: </span>{application.institution}
-// //                         </div>
-// //                         <div>
-// //                             <span className="font-semibold">Department: </span>{application.department}
-// //                         </div>
-// //                         <div>
-// //                             <span className="font-semibold">Level: </span>{application.level}
-// //                         </div>
-// //                         <div>
-// //                             <span className="font-semibold">Matric Number: </span>{application.matricNumber}
-// //                         </div>
-// //                         <div>
-// //                             <span className="font-semibold">Address: </span>{application.address}
-// //                         </div>
-// //                         <div>
-// //                             <span className="font-semibold">LGA of Origin: </span>{application.lgaOfOrigin}
-// //                         </div>
-// //                         <div>
-// //                             <span className="font-semibold">State of Residence: </span>{application.stateOfResidence}
-// //                         </div>
-// //                     </div>
-// //                     <div className="mt-4 flex justify-end space-x-4">
-// //                         <button
-// //                             className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
-// //                             onClick={() => {
-// //                                 alert('You can pay later.');
-// //                                 window.location.href = "/my-order";
-// //                             }}
-// //                         >
-// //                             Pay Later
-// //                         </button>
-// //                         <PaystackButton
-// //                             amount={5000}
-// //                             orderId={application._id}
-// //                             onSuccess={(data) => {
-// //                                 alert('Payment successful!');
-// //                                 console.log("data from paystack", data);
-// //                             }}
-// //                         />
-// //                     </div>
-// //                 </div>
-// //             )}
-// //         </div>
-// //     );
-// // };
-
-// // export default ApplicationForm;
-

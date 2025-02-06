@@ -19,7 +19,8 @@ app.use(bodyParser.json());
 app.use('/api', require('./controllers/generalController'));
 // app.use('/apis', require('./routes/general'));
 app.use('/api/auth', require('./controllers/authController'));
-
+app.use('/api/admin', require('./controllers/adminController'));
+app.use('/api/payment', require('./routes/paymentRoutes'));
 
 // Start server
 const PORT = process.env.PORT || 5000;

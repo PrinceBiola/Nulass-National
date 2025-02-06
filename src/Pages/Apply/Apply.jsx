@@ -23,29 +23,28 @@ export default function Applications() {
   const validateForm = () => {
     const newErrors = {};
 
-    // Validate First Name
     if (!formData.firstName.trim()) {
       newErrors.firstName = "First name is required";
     }
 
-    // Validate Last Name
+  
     if (!formData.lastName.trim()) {
       newErrors.lastName = "Last name is required";
     }
 
-    // Validate Email
+ 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim() || !emailRegex.test(formData.email)) {
       newErrors.email = "Valid email is required";
     }
 
-    // Validate Phone
+   
     const phoneRegex = /^\d{11}$/;
     if (!formData.phone.trim() || !phoneRegex.test(formData.phone)) {
       newErrors.phone = "Valid 11-digit phone number is required";
     }
 
-    // Validate other required fields
+
     const requiredFields = [
       'institution', 'department', 'level', 'matricNumber',
       'address', 'lgaOrigin', 'stateResidence'
@@ -67,9 +66,9 @@ export default function Applications() {
 
     if (validateForm()) {
       try {
-        // Here you would typically make an API call
+       
         console.log("Form data:", formData);
-        // Simulate API call
+       
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         // Redirect to payment page or show success message
@@ -165,7 +164,7 @@ export default function Applications() {
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
-            {/* Personal Information */}
+           
             <div className="grid md:grid-cols-2 gap-6">
               {renderField("firstName", "First Name")}
               {renderField("lastName", "Last Name")}

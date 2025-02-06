@@ -37,6 +37,7 @@ import UserOrders from "./Components/Order/UserOrders";
 import IdCard from "./Pages/IdCard/IdCard";
 import Course from "./Pages/Blog/Course";
 import SignUpModal from "./Pages/Auth/SignUpModal";
+import ApplicationManagement from "./Pages/Admin/ApplicationManagement";
 // import InstiEvent from "./Pages/InstiEvent/InstiEvent";
 
 
@@ -51,7 +52,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login"
               element={<Login />} />
-            <Route path="/signup" element={<SignUpModal opened={true} setOpened={() => { }} />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route path="/course" element={<Course />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
@@ -60,6 +61,7 @@ function App() {
             <Route path="/blog/:id" element={<BlogDetails />} />
             <Route path="/about" element={<About />} />
             <Route path="/apply" element={<Applications />} />
+            <Route path="/admin-application" element={<ApplicationManagement />} />
             <Route path="/events" element={<Eventss />} />
 
             {/* Private Routes */}
