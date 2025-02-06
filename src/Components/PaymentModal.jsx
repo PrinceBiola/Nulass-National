@@ -1,142 +1,273 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Dialog } from '@headlessui/react';
 import { usePaystackPayment } from 'react-paystack';
-import { toast } from 'react-toastify';
+import { useDropzone } from 'react-dropzone';
 import { verifyPayment, uploadOfflinePayment } from '../api/payment';
-import { API_URL } from '../config';
+import { useAuthContext } from '../context/AuthContext';
+import StatusModal from './StatusModal';
 
 const PaymentModal = ({ isOpen, onClose, applicationData }) => {
+  const { token } = useAuthContext();
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [receipt, setReceipt] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [statusModal, setStatusModal] = useState({
+    show: false,
+    type: 'success',
+    message: ''
+  });
+
+  // Add console.log to debug applicationData
+  console.log('Application Data:', applicationData);
+
+  // Bank Account Details
+  const bankDetails = {
+    bankName: "First Bank",
+    accountNumber: "0123456789",
+    accountName: "NULLAS Student ID",
+    amount: "₦5,000"
+  };
 
   const config = {
     reference: new Date().getTime().toString(),
     email: applicationData?.email,
-    amount: 5000 * 100, // 5000 Naira in kobo
+    amount: 5000 * 100,
     publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+    onSuccess: (reference) => handlePaystackSuccess(reference),
+    onClose: () => {
+      setIsProcessing(false);
+      setPaymentMethod(null);
+    }
   };
 
   const initializePaystack = usePaystackPayment(config);
 
   const handlePaystackSuccess = async (reference) => {
+    setIsProcessing(true);
     try {
-      await verifyPayment(reference);
-      toast.success('Payment successful!');
-      onClose();
+      if (!applicationData?._id && !applicationData?.id) {
+        throw new Error('Application ID is missing');
+      }
+
+      await verifyPayment({
+        reference,
+        applicationId: applicationData._id || applicationData.id
+      }, token);
+
+      setStatusModal({
+        show: true,
+        type: 'success',
+        message: 'Payment successful! Your application is now complete.'
+      });
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     } catch (error) {
-      toast.error('Error verifying payment');
+      console.error('Payment Error:', error);
+      setStatusModal({
+        show: true,
+        type: 'error',
+        message: error.response?.data?.message || error.message || 'Error verifying payment'
+      });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
+  // Drag and drop functionality
+  const onDrop = useCallback(acceptedFiles => {
+    if (acceptedFiles[0]) {
+      setReceipt(acceptedFiles[0]);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png'],
+      'application/pdf': ['.pdf']
+    },
+    maxSize: 5242880 // 5MB
+  });
+
   const handleOfflinePayment = async () => {
     if (!receipt) {
-      toast.error('Please select a receipt file');
+      setStatusModal({
+        show: true,
+        type: 'error',
+        message: 'Please upload your payment receipt'
+      });
       return;
     }
 
+    if (!applicationData?._id && !applicationData?.id) {
+      setStatusModal({
+        show: true,
+        type: 'error',
+        message: 'Application ID is missing'
+      });
+      return;
+    }
+
+    setIsProcessing(true);
     try {
       const formData = new FormData();
       formData.append('receipt', receipt);
-      formData.append('applicationId', applicationData.id);
+      formData.append('applicationId', applicationData._id || applicationData.id);
       
-      await uploadOfflinePayment(formData);
-      toast.success('Receipt uploaded successfully');
-      onClose();
+      await uploadOfflinePayment(formData, token);
+      setStatusModal({
+        show: true,
+        type: 'success',
+        message: 'Receipt uploaded successfully! We will verify your payment shortly.'
+      });
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     } catch (error) {
-      toast.error('Error uploading receipt');
+      console.error('Upload Error:', error);
+      setStatusModal({
+        show: true,
+        type: 'error',
+        message: error.response?.data?.message || error.message || 'Error uploading receipt'
+      });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
-    <Dialog 
-      open={isOpen} 
-      onClose={onClose}
-      className="relative z-50"
-    >
-      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+    <>
+      <Dialog 
+        open={isOpen} 
+        onClose={onClose}
+        className="relative z-50"
+      >
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
 
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="mx-auto max-w-md rounded-xl bg-white p-6">
-          <Dialog.Title className="text-xl font-semibold mb-4">
-            Choose Payment Method
-          </Dialog.Title>
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="mx-auto max-w-md rounded-xl bg-white p-6">
+            <Dialog.Title className="text-xl font-semibold mb-4">
+              Payment for Student ID Application
+            </Dialog.Title>
 
-          <div className="space-y-4">
-            {!paymentMethod && (
-              <>
-                <button
-                  onClick={() => setPaymentMethod('online')}
-                  className="w-full p-4 text-left border rounded-lg hover:bg-gray-50"
-                >
-                  <div className="font-medium">Pay Online</div>
-                  <div className="text-sm text-gray-500">Pay instantly with card</div>
-                </button>
-
-                <button
-                  onClick={() => setPaymentMethod('offline')}
-                  className="w-full p-4 text-left border rounded-lg hover:bg-gray-50"
-                >
-                  <div className="font-medium">Pay Offline</div>
-                  <div className="text-sm text-gray-500">Upload payment receipt</div>
-                </button>
-              </>
-            )}
-
-            {paymentMethod === 'online' && (
-              <div className="space-y-4">
-                <p className="text-gray-600">
-                  You will be redirected to Paystack to complete your payment of ₦5,000
-                </p>
-                <button
-                  onClick={() => {
-                    initializePaystack(handlePaystackSuccess, () => {
-                      setPaymentMethod(null);
-                    });
-                  }}
-                  className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600"
-                >
-                  Proceed to Payment
-                </button>
-                <button
-                  onClick={() => setPaymentMethod(null)}
-                  className="w-full border py-2 rounded-lg"
-                >
-                  Back
-                </button>
+            <div className="mb-4">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="font-medium text-blue-800">Amount to Pay: ₦5,000</p>
               </div>
-            )}
+            </div>
 
-            {paymentMethod === 'offline' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Upload Receipt
-                  </label>
-                  <input
-                    type="file"
-                    onChange={(e) => setReceipt(e.target.files[0])}
-                    className="w-full border rounded-lg p-2"
-                    accept="image/*,.pdf"
-                  />
+            <div className="space-y-4">
+              {!paymentMethod && (
+                <>
+                  <button
+                    onClick={() => setPaymentMethod('online')}
+                    className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition"
+                  >
+                    <div className="font-medium">Pay Online</div>
+                    <div className="text-sm text-gray-500">Pay instantly with card via Paystack</div>
+                  </button>
+
+                  <button
+                    onClick={() => setPaymentMethod('offline')}
+                    className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition"
+                  >
+                    <div className="font-medium">Pay Offline</div>
+                    <div className="text-sm text-gray-500">Bank transfer/deposit and upload receipt</div>
+                  </button>
+                </>
+              )}
+
+              {paymentMethod === 'online' && (
+                <div className="space-y-4">
+                  <p className="text-gray-600">
+                    You will be redirected to Paystack to complete your payment of ₦5,000
+                  </p>
+                  <button
+                    onClick={() => {
+                      setIsProcessing(true);
+                      initializePaystack();
+                    }}
+                    disabled={isProcessing}
+                    className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+                  >
+                    {isProcessing ? 'Processing...' : 'Proceed to Payment'}
+                  </button>
+                  <button
+                    onClick={() => setPaymentMethod(null)}
+                    disabled={isProcessing}
+                    className="w-full border py-2 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    Back
+                  </button>
                 </div>
-                <button
-                  onClick={handleOfflinePayment}
-                  className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"
-                >
-                  Submit Receipt
-                </button>
-                <button
-                  onClick={() => setPaymentMethod(null)}
-                  className="w-full border py-2 rounded-lg"
-                >
-                  Back
-                </button>
-              </div>
-            )}
-          </div>
-        </Dialog.Panel>
-      </div>
-    </Dialog>
+              )}
+
+              {paymentMethod === 'offline' && (
+                <div className="space-y-4">
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                    <h3 className="font-medium">Bank Account Details</h3>
+                    {Object.entries(bankDetails).map(([key, value]) => (
+                      <div key={key} className="flex justify-between text-sm">
+                        <span className="text-gray-600">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                        <span className="font-medium">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Upload Payment Receipt
+                    </label>
+                    <div
+                      {...getRootProps()}
+                      className={`border-2 border-dashed rounded-lg p-6 cursor-pointer transition
+                        ${isDragActive ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-gray-400'}`}
+                    >
+                      <input {...getInputProps()} />
+                      <div className="text-center space-y-2">
+                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <div className="text-gray-600">
+                          {receipt ? receipt.name : 'Drag and drop your receipt here, or click to select'}
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          Supported formats: JPG, PNG, PDF (max 5MB)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleOfflinePayment}
+                    disabled={!receipt || isProcessing}
+                    className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+                  >
+                    {isProcessing ? 'Processing...' : 'Submit Receipt'}
+                  </button>
+                  <button
+                    onClick={() => setPaymentMethod(null)}
+                    disabled={isProcessing}
+                    className="w-full border py-2 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    Back
+                  </button>
+                </div>
+              )}
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
+
+      {/* Status Modal */}
+      <StatusModal
+        isOpen={statusModal.show}
+        onClose={() => setStatusModal({ ...statusModal, show: false })}
+        type={statusModal.type}
+        message={statusModal.message}
+      />
+    </>
   );
 };
 

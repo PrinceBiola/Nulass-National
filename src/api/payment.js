@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_URL } from '../config';
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Create axios instance with auth header
 const api = axios.create({
@@ -19,9 +19,17 @@ api.interceptors.request.use((config) => {
 });
 
 // Verify online payment
-export const verifyPayment = async (reference) => {
+export const verifyPayment = async ({ reference, applicationId }, token) => {
   try {
-    const response = await api.post('/api/payment/verify', { reference });
+    const response = await axios.post(`${API_URL}/api/payment/verify`, 
+      { reference, applicationId },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      }
+    );
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: 'Payment verification failed' };
@@ -29,13 +37,16 @@ export const verifyPayment = async (reference) => {
 };
 
 // Upload offline payment receipt
-export const uploadOfflinePayment = async (formData) => {
+export const uploadOfflinePayment = async (formData, token) => {
   try {
-    const response = await api.post('/api/payment/offline', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await axios.post(`${API_URL}/api/payment/offline-payment`, 
+      formData,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      }
+    );
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: 'Failed to upload receipt' };
@@ -48,6 +59,6 @@ export const getPaymentReceipt = async (applicationId) => {
     const response = await api.get(`/api/payment/receipt/${applicationId}`);
     return response.data;
   } catch (error) {
-    throw error.response?.data || { message: 'Failed to get receipt' };
+    throw error.response?.data || error.message;
   }
 }; 

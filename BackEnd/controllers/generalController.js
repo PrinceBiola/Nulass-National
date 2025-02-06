@@ -225,11 +225,19 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Update the apply route to handle image uploads
+// Update the apply route to check for existing applications
 router.post('/apply', protect, upload.single('image'), async (req, res) => {
-    const { firstName, lastName, email, phoneNumber, NIN, institution, department, level, matricNumber, address, lgaOfOrigin, stateOfResidence } = req.body;
+    const { firstName, lastName, phoneNumber, NIN, institution, department, level, matricNumber, address, lgaOfOrigin, stateOfResidence } = req.body;
 
     try {
+        // Check for existing application for this user
+        const existingApplication = await Application.findOne({ user: req.user._id });
+        if (existingApplication) {
+            return res.status(409).json({ 
+                message: 'You have already submitted an application. Only one application per user is allowed.' 
+            });
+        }
+
         // Check if the file was uploaded
         if (!req.file) {
             return res.status(400).json({ message: 'Image file is required' });
@@ -239,7 +247,7 @@ router.post('/apply', protect, upload.single('image'), async (req, res) => {
             user: req.user._id,
             firstName,
             lastName,
-            email,
+            email: req.user.email, // Use email from authenticated user
             phoneNumber,
             NIN,
             institution,
@@ -249,7 +257,7 @@ router.post('/apply', protect, upload.single('image'), async (req, res) => {
             address,
             lgaOfOrigin,
             stateOfResidence,
-            image: req.file.path, // Access the file path
+            image: req.file.path,
         });
 
         await application.save();
@@ -263,13 +271,34 @@ router.post('/apply', protect, upload.single('image'), async (req, res) => {
 
         await order.save();
 
-        res.status(201).json({ message: 'Application and order created successfully!', application });
+        // Send confirmation email
+        await sendEmail(
+            req.user.email,
+            'Application Submitted Successfully',
+            `Dear ${firstName},\n\nYour application has been submitted successfully. Please proceed with the payment to complete your application process.\n\nBest regards,\nNULLAS Team`
+        );
+
+        res.status(201).json({ 
+            message: 'Application submitted successfully! Please proceed with payment.', 
+            application 
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
-  
 
+// Add an endpoint to check if user has existing application
+router.get('/check-application', protect, async (req, res) => {
+    try {
+        const existingApplication = await Application.findOne({ user: req.user._id });
+        res.status(200).json({ 
+            hasExistingApplication: !!existingApplication,
+            application: existingApplication 
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
   router.get('/applications', protect, admin, async (req, res) => {
     try {
