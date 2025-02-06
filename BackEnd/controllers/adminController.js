@@ -61,8 +61,7 @@ router.patch('/applications/:id/status', async (req, res) => {
   }
 });
 
-// Export applications to Excel
-router.get('/applications/export', protect, admin, async (req, res) => {
+router.get('/applications/export',  async (req, res) => {
   try {
     const applications = await Application.find().populate('user', 'email');
     

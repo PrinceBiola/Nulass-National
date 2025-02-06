@@ -5,11 +5,7 @@ import { formatDate } from "../../Helper/helper";
 import { fetchPost } from "../../api/blog";
 
 const BlogDetails = () => {
-<<<<<<< HEAD
   const { id } = useParams(); 
-=======
-  const { id } = useParams();
->>>>>>> a60784350c6e9c98136f9be13cfcb3ea5d9a088a
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
