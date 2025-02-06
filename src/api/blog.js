@@ -23,6 +23,32 @@ export const fetchCourse = async () => {
     }
 };
 
+// Fetch 3 latest blog posts
+
+export const fetchBlogs = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/blogs`);
+      return response.data.slice(0, 3); 
+      
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+      throw error;
+    }
+};
+
+
+// Fetch a single post
+export const fetchPost = async (id) => {
+    try {
+      const response = await axios.get(`${API_URL}/blogs/${id}`);
+      return response.data;
+
+    } catch (error) {
+        console.error('Error fetching post:', error);
+      throw error;
+    }
+};
+
 
 
 // Create a new blog post

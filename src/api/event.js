@@ -13,6 +13,19 @@ export const fetchEvents = async () => {
     }
 };
 
+// Fetch 3 events
+
+export const fetchLatestEvents = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/events`);
+      return response.data.slice(0, 3); 
+      
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      throw error;
+    }
+};
+
 // Create a new event
 export const createEvent = async (eventData) => {
     try {

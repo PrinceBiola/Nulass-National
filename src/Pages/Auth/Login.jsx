@@ -15,6 +15,11 @@ export default function Login() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const { handleChange } = useAuthContext();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -92,7 +97,7 @@ export default function Login() {
             <div className="flex flex-col text-base md:text-lg font-semibold text-start">
               <label htmlFor="password">Password</label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
                 placeholder="Enter Your Password"
@@ -101,6 +106,19 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+            </div>
+
+            <div className="flex items-center gap-2 text-sm md:text-base">
+              <input
+                type="checkbox"
+                id="showPassword"
+                checked={showPassword}
+                onChange={toggleShowPassword}
+                className="cursor-pointer"
+              />
+              <label htmlFor="showPassword" className="cursor-pointer">
+                Show Password
+              </label>
             </div>
 
             <button

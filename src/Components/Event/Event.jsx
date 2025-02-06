@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FaMapMarkerAlt, FaClock, FaCalendarAlt } from 'react-icons/fa';
-import axios from 'axios';
-import { formatDate } from '../../Helper/helper';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FaMapMarkerAlt, FaClock, FaCalendarAlt } from "react-icons/fa";
+import axios from "axios";
+import { formatDate } from "../../Helper/helper";
+import { fetchLatestEvents } from "../../api/event";
 
 function Event() {
   const [eventPosts, setEventPosts] = useState([]);
@@ -12,11 +13,11 @@ function Event() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/events");
-        const latestEvents = response.data.slice(0, 3); 
-        setEventPosts(latestEvents);
+        const fetchedEvent = await fetchLatestEvents();
+        setEventPosts(fetchedEvent);
+        console.log("event", fetchedEvent);
       } catch (error) {
-        console.error("Error fetching events:", error);
+        setError("Failed to fetch event.");
       } finally {
         setLoading(false);
       }
@@ -43,7 +44,8 @@ function Event() {
             Upcoming Events
           </h3>
           <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-            Stay connected with the NULASS community through our exciting events and programs.
+            Stay connected with the NULASS community through our exciting events
+            and programs.
           </p>
         </motion.div>
 
@@ -72,9 +74,7 @@ function Event() {
                   <h4 className="text-xl font-semibold text-gray-900 mb-3">
                     {event.title}
                   </h4>
-                  <p className="text-gray-600 mb-4">
-                    {event.description}
-                  </p>
+                  <p className="text-gray-600 mb-4">{event.description}</p>
                   <div className="space-y-2 text-sm text-gray-500 mb-4">
                     <div className="flex items-center gap-2">
                       <FaCalendarAlt className="text-customGreen" />
