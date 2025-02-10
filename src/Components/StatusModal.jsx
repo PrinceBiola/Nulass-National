@@ -29,7 +29,7 @@ const StatusModal = ({ isOpen, onClose, type = 'success', message }) => {
             <Dialog.Title className={`mt-4 text-xl font-semibold ${
               type === 'success' ? 'text-green-900' : 'text-red-900'
             }`}>
-              {type === 'success' ? 'Success!' : 'Oops!'}
+              {type === 'success' ? 'Success!' : 'Oops!'} 
             </Dialog.Title>
 
             {/* Message */}

@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { verifyPayment, uploadOfflinePayment } from '../api/payment';
 import { useAuthContext } from '../context/AuthContext';
 import StatusModal from './StatusModal';
-
+// make sure u understand this code is connected to my page read and understand 
 const PaymentModal = ({ isOpen, onClose, applicationData, onPaymentSuccess }) => {
   const { token } = useAuthContext();
   const [paymentMethod, setPaymentMethod] = useState(null);
@@ -32,7 +32,7 @@ const PaymentModal = ({ isOpen, onClose, applicationData, onPaymentSuccess }) =>
     reference: new Date().getTime().toString(),
     email: applicationData?.email,
     amount: 5000 * 100,
-    publicKey: 'pk_test_8ba0442163c9e7f0e0817c6dd94622a9829b35f2',
+    publicKey: 'pk_test_8ba0442163c9e7f0e0817c6dd94622a9829b35f2', // this is the public key for paystack
     onSuccess: (reference) => handlePaystackSuccess(reference),
     onClose: () => {
       setIsProcessing(false);
@@ -43,6 +43,7 @@ const PaymentModal = ({ isOpen, onClose, applicationData, onPaymentSuccess }) =>
   const initializePaystack = usePaystackPayment(config);
 
   const handlePaystackSuccess = async (reference) => {
+      console.log("refrence", reference)
     setIsProcessing(true);
     try {
       if (!applicationData?._id && !applicationData?.id) {
@@ -89,7 +90,7 @@ const PaymentModal = ({ isOpen, onClose, applicationData, onPaymentSuccess }) =>
       'image/*': ['.jpeg', '.jpg', '.png'],
       'application/pdf': ['.pdf']
     },
-    maxSize: 5242880 // 5MB
+    maxSize: 5242880 // 5MB 
   });
 
   const handleOfflinePayment = async () => {
