@@ -6,7 +6,7 @@ import { verifyPayment, uploadOfflinePayment } from '../api/payment';
 import { useAuthContext } from '../context/AuthContext';
 import StatusModal from './StatusModal';
 
-const PaymentModal = ({ isOpen, onClose, applicationData }) => {
+const PaymentModal = ({ isOpen, onClose, applicationData, onPaymentSuccess }) => {
   const { token } = useAuthContext();
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [receipt, setReceipt] = useState(null);
@@ -32,7 +32,7 @@ const PaymentModal = ({ isOpen, onClose, applicationData }) => {
     reference: new Date().getTime().toString(),
     email: applicationData?.email,
     amount: 5000 * 100,
-    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+    publicKey: 'pk_test_8ba0442163c9e7f0e0817c6dd94622a9829b35f2',
     onSuccess: (reference) => handlePaystackSuccess(reference),
     onClose: () => {
       setIsProcessing(false);
@@ -57,17 +57,19 @@ const PaymentModal = ({ isOpen, onClose, applicationData }) => {
       setStatusModal({
         show: true,
         type: 'success',
-        message: 'Payment successful! Your application is now complete.'
+        message: 'Payment successful! Our admin team will review your application and send you an email once your ID is approved.'
       });
+      
+      // Call onPaymentSuccess after 2 seconds and redirect to dashboard
       setTimeout(() => {
-        onClose();
+        onPaymentSuccess();
+        window.location.href = '/user-order';
       }, 2000);
     } catch (error) {
-      console.error('Payment Error:', error);
       setStatusModal({
         show: true,
         type: 'error',
-        message: error.response?.data?.message || error.message || 'Error verifying payment'
+        message: error.response?.data?.message || 'Error verifying payment'
       });
     } finally {
       setIsProcessing(false);
@@ -100,15 +102,6 @@ const PaymentModal = ({ isOpen, onClose, applicationData }) => {
       return;
     }
 
-    if (!applicationData?._id && !applicationData?.id) {
-      setStatusModal({
-        show: true,
-        type: 'error',
-        message: 'Application ID is missing'
-      });
-      return;
-    }
-
     setIsProcessing(true);
     try {
       const formData = new FormData();
@@ -119,17 +112,19 @@ const PaymentModal = ({ isOpen, onClose, applicationData }) => {
       setStatusModal({
         show: true,
         type: 'success',
-        message: 'Receipt uploaded successfully! We will verify your payment shortly.'
+        message: 'Receipt uploaded successfully! Our admin team will verify your payment and send you an email once your ID is approved.'
       });
+
+      // Call onPaymentSuccess after 2 seconds and redirect to dashboard
       setTimeout(() => {
-        onClose();
+        onPaymentSuccess();
+        window.location.href = '/user-order';
       }, 2000);
     } catch (error) {
-      console.error('Upload Error:', error);
       setStatusModal({
         show: true,
         type: 'error',
-        message: error.response?.data?.message || error.message || 'Error uploading receipt'
+        message: error.response?.data?.message || 'Error uploading receipt'
       });
     } finally {
       setIsProcessing(false);

@@ -1,19 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
-  FaHome,
-  FaUsers,
-  FaBlog,
-  FaCalendarAlt,
-  FaMoneyBillWave,
-  FaChartBar,
-  FaEnvelope,
-  FaCog,
-  FaUserCircle,
-  FaIdCard,
-  FaUserAlt,
+  FaHome, FaUsers, FaBlog, FaCalendarAlt, FaMoneyBillWave,
+  FaChartBar, FaEnvelope, FaCog, FaUserCircle, FaIdCard,
+  FaUserAlt, FaBars, FaSearch, FaBell
 } from "react-icons/fa";
-
 import Logo from "../../assets/Images/Logo.png";
 import { useAuthContext } from "../../context/AuthContext";
 
@@ -27,86 +18,91 @@ function DashboardLayout({ children }) {
   useEffect(() => {
     if (user) {
       setUserName(user.name);
-      setRole(user.role); 
+      setRole(user.role);
     }
   }, [user]);
 
 
   const menuItems = [
-    { 
-      path: "/dashboard", 
-      icon: FaHome, 
-      label: "Dashboard", 
+    {
+      path: "/dashboard",
+      icon: FaHome,
+      label: "Dashboard",
       roles: ["admin", "student", "superadmin", "intitution"],
       bgColor: "from-blue-400 to-blue-600"
     },
-    { 
-      path: "/application", 
-      icon: FaUserAlt, 
-      label: "Application", 
-      roles: ["student", "institution"],
+    {
+      path: "/application",
+      icon: FaUserAlt,
+      label: "Application",
+      roles: ["student", "admin"],
       bgColor: "from-purple-400 to-purple-600"
     },
-    { 
-      path: "/idcard", 
-      icon: FaIdCard, 
-      label: "ID Card", 
+    {
+      path: "/idcard",
+      icon: FaIdCard,
+      label: "ID Card",
       roles: ["student"],
       bgColor: "from-pink-400 to-pink-600"
     },
-    { 
-      path: "/dashboard/users", 
-      icon: FaUsers, 
-      label: "Member Management", 
+    {
+      path: "/dashboard/users",
+      icon: FaUsers,
+      label: "Member Management",
       roles: ["admin"],
       bgColor: "from-green-400 to-green-600"
     },
-    { path: "/dashboard/blog", icon: FaBlog, label: "Blog Management", roles: ["admin"] , bgColor: "from-green-400 to-green-600"},
-    { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin",, "institution"] , bgColor: "from-green-400 to-green-600"},
-    { path: "/dashboard/finance", icon: FaMoneyBillWave, label: "Financials", roles: ["admin", "superadmin"] , bgColor: "from-green-400 to-green-600"},
+    { path: "/dashboard/blog", icon: FaBlog, label: "Blog Management", roles: ["admin"], bgColor: "from-green-400 to-green-600" },
+    { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", , "institution"], bgColor: "from-green-400 to-green-600" },
+    { path: "/dashboard/finance", icon: FaMoneyBillWave, label: "Financials", roles: ["admin", "superadmin"], bgColor: "from-green-400 to-green-600" },
     { path: "/dashboard/analytics", icon: FaChartBar, label: "Analytics", roles: ["admin", "student"] },
-    { path: "/dashboard/messages", icon: FaEnvelope, label: "Communication", roles: ["admin"] , bgColor: "from-green-400 to-green-600"},
-    { path: "/dashboard/settings", icon: FaCog, label: "Settings", roles: ["admin"] , bgColor: "from-green-400 to-green-600"},
-    { path: "/profile", icon: FaUserCircle, label: "Profile", roles: ["admin", "student", "institution", "superadmin"] , bgColor: "from-green-400 to-green-600"},
+    { path: "/dashboard/messages", icon: FaEnvelope, label: "Communication", roles: ["admin"], bgColor: "from-green-400 to-green-600" },
+    { path: "/dashboard/settings", icon: FaCog, label: "Settings", roles: ["admin"], bgColor: "from-green-400 to-green-600" },
+    { path: "/profile", icon: FaUserCircle, label: "Profile", roles: ["admin", "student", "institution", "superadmin"], bgColor: "from-green-400 to-green-600" },
     // { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", "student", "institution"] },
   ];
 
 
   return (
-    <div className="min-h-screen bg-gray-100 ">
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-40 h-screen transition-transform ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } bg-white shadow-xl w-72`}
+        className={`fixed lg:static lg:translate-x-0 z-50 h-full transition-all duration-300 ease-in-out
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        w-72 bg-white border-r border-gray-200 shadow-sm`}
       >
-    
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+        {/* Logo Section */}
+        <div className="h-16 flex items-center justify-between px-6 border-b">
           <Link to="/" className="flex items-center space-x-3">
-            <img src={Logo} alt="NULASS Logo" className="h-10 w-10" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <img src={Logo} alt="NULASS" className="h-8 w-8" />
+            <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
               NULASS
             </span>
           </Link>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden">
-            <FaCog className="w-5 h-5 text-gray-500 hover:text-gray-700 transition-colors" />
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-gray-700">
+            <FaBars className="h-5 w-5" />
           </button>
         </div>
 
-        {/* User Profile Section */}
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-400 to-blue-500 flex items-center justify-center">
-              <FaUserCircle className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-gray-700">{userName}</h3>
-              <p className="text-xs text-gray-500">{role?.replace('_', ' ').toUpperCase()}</p>
+        {/* User Profile Card */}
+        <div className="p-4 border-b">
+          <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50 to-violet-50">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 flex items-center justify-center">
+                <span className="text-white text-lg font-semibold">
+                  {userName?.charAt(0)}
+                </span>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-800">{userName}</h3>
+                <p className="text-xs text-gray-500">{role?.replace('_', ' ').toUpperCase()}</p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Navigation Menu */}
-        <nav className="p-4 space-y-2">
+        <nav className="p-4 space-y-1.5">
           {menuItems
             .filter((item) => item.roles.includes(role))
             .map((item) => {
@@ -115,38 +111,16 @@ function DashboardLayout({ children }) {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-300 group relative overflow-hidden ${
-                    isActive 
-                      ? `bg-gradient-to-r ${item.bgColor} text-white shadow-lg` 
-                      : 'hover:bg-gray-50'
-                  }`}
+                  className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200
+                    ${isActive
+                      ? 'bg-gradient-to-r from-green-600 to-green-600 text-white shadow-md'
+                      : 'hover:bg-gray-50 text-gray-700'
+                    }`}
                 >
-                  {/* Background Animation */}
-                  <div className={`absolute inset-0 bg-gradient-to-r ${item.bgColor} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                  
-                  {/* Icon */}
-                  <div className={`p-2 rounded-lg ${
-                    isActive 
-                      ? 'text-white' 
-                      : `text-gray-600 group-hover:text-gray-900`
-                  }`}>
-                    <item.icon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110 ${
-                      isActive ? 'rotate-6' : ''
-                    }`} />
-                  </div>
-                  
-                  {/* Label */}
-                  <span className={`font-medium ${
-                    isActive 
-                      ? 'text-white' 
-                      : 'text-gray-700 group-hover:text-gray-900'
-                  }`}>
-                    {item.label}
-                  </span>
-                  
-                  {/* Active Indicator */}
+                  <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-500'}`} />
+                  <span className="ml-3 font-medium text-sm">{item.label}</span>
                   {isActive && (
-                    <div className="absolute right-4 w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white"></div>
                   )}
                 </Link>
               );
@@ -155,58 +129,68 @@ function DashboardLayout({ children }) {
           {/* Logout Button */}
           <button
             onClick={logout}
-            className="flex items-center space-x-3 p-3 w-full text-left rounded-xl transition-all duration-300 group relative overflow-hidden hover:bg-red-50"
+            className="flex items-center w-full px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-red-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-            <div className="p-2 rounded-lg text-red-600">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 transition-transform duration-300 group-hover:scale-110"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-14v1"
-                />
-              </svg>
-            </div>
-            <span className="font-medium text-red-600">Logout</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-14v1" />
+            </svg>
+            <span className="ml-3 font-medium text-sm">Logout</span>
           </button>
         </nav>
       </aside>
 
       {/* Main Content */}
-      <div className={`${isSidebarOpen ? "lg:ml-72" : ""}`}>
+      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between p-4">
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(!isSidebarOpen)}
-              className="lg:hidden"
+              className="lg:hidden text-gray-500 hover:text-gray-700"
             >
-              <FaCog className="w-5 h-5" />
+              <FaBars className="h-5 w-5" />
             </button>
+            <div className="hidden md:flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-lg">
+              <FaSearch className="text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="bg-transparent border-none focus:outline-none text-sm"
+              />
+            </div>
+          </div>
 
-            <div className="flex justify-between items-center w-full">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-3">
-                  <FaUserCircle className="w-8 h-8" />
-                  <div className="hidden md:block">
-                    <p className="text-sm font-semibold">{userName}</p>
-                    <p className="text-xs text-gray-500">{user?.email}</p>
-                  </div>
-                </div>
+          <div className="flex items-center gap-4">
+            <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg">
+              <FaBell className="h-5 w-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div className="hidden md:flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">
+                  {userName?.charAt(0)}
+                </span>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-700">{userName}</p>
+                <p className="text-xs text-gray-500">{user?.email}</p>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="p-4 md:p-6 lg:p-8">{children}</main>
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-auto bg-gray-50 p-4 lg:p-8">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );

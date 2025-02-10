@@ -5,7 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 const Application = require('../models/Application');
 const { verifyPaystackPayment } = require('../utils/paystack');
 const { sendEmail } = require('../utils/email');
-// const { sendEmail } = require('../utils/email');
+
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
