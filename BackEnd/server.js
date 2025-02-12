@@ -23,6 +23,7 @@ app.use('/api', require('./controllers/generalController'));
 app.use('/api/auth', require('./controllers/authController'));
 app.use('/api/admin', require('./controllers/adminController'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
+app.use("/uploads", express.static("./uploads"));
 app.use('/api/applications', applicationRoutes);
 
 // Connect to MongoDB

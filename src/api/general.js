@@ -23,12 +23,12 @@ export const ApplyUser = async (data, token) => {
 
 // Function to get user application by user ID
 export const getUserApplication = async (userId, token) => {
-    const response = await axios.get(`${API_URL}/applications/${userId}`, {
+    const response = await axios.get(`${API_URL}/orders`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
     });
-    return response.data; // Return the application data
+    return response.data; 
 };
 
 

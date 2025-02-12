@@ -9,6 +9,7 @@ import UploadFormTextarea from '../../Components/UploadFormInput/UploadFormTexta
 import { toast } from 'react-toastify';
 import PaymentModal from '../../Components/PaymentModal';
 import StatusModal from '../../Components/StatusModal';
+import { CheckCheckIcon } from 'lucide-react';
 // import { CheckIcon } from '@heroicons/react/24/outline';
 
 const ApplicationForm = () => {
@@ -38,22 +39,40 @@ const ApplicationForm = () => {
 
   const [applicationData, setApplicationData] = useState(null);
   const [errorMessages, setErrorMessages] = useState({});
+  const [orders, setOrders] = useState([]);
+
+  // useEffect(() => {
+   
+  //   const fetchApplicationStatus = async () => {
+  //     try {
+  //       const response = await getUserApplication(user._id, token);
+  //       if (response.data) {
+  //         console.log("data coming from user application", response.data)
+  //         setApplicationData(response.data.application);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching application status:', error);
+  //     }
+  //   };
+
+  //   fetchApplicationStatus();
+  // }, [user, token]);
+
+  
 
   useEffect(() => {
-    // Fetch the user's application status when the component mounts
     const fetchApplicationStatus = async () => {
       try {
-        const response = await getUserApplication(user._id, token); // Fetch the application data
-        if (response.data) {
-          setApplicationData(response.data.application);
-        }
+        const response = await axios.get("http://localhost:5000/api/orders", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setApplicationData(response.data);
       } catch (error) {
-        console.error('Error fetching application status:', error);
+        console.error(error.response.data);
       }
     };
-
     fetchApplicationStatus();
-  }, [user, token]);
+  }, [token]);
 
   const handleChange = (name, value) => {
     setFormData(prev => ({
@@ -66,15 +85,35 @@ const ApplicationForm = () => {
     const errors = {};
     if (isNaN(formData.phoneNumber) || formData.phoneNumber.trim() === '') {
       errors.phoneNumber = 'Phone number must be a valid number.';
+      setStatusModal({
+        type: errorMessages,
+        message: "Phone number must be a valid number",
+        show: true
+      })
     }
     if (formData.NIN && (isNaN(formData.NIN) || formData.NIN.trim() === '')) {
       errors.NIN = 'NIN must be a valid number.';
+      setStatusModal({
+        type: errorMessages,
+        message: "Phone number must be a valid number",
+        show: true
+      })
     }
     if (isNaN(formData.level) || formData.level.trim() === '') {
       errors.level = 'Level must be a valid number.';
+      setStatusModal({
+        type: errorMessages,
+        message: "Phone number must be a valid number",
+        show: true
+      })
     }
     if (isNaN(formData.matricNumber) || formData.matricNumber.trim() === '') {
       errors.matricNumber = 'Matric number must be a valid number.';
+      setStatusModal({
+        type: errorMessages,
+        message: "Phone number must be a valid number",
+        show: true
+      })
     }
     setErrorMessages(errors);
     return Object.keys(errors).length === 0;
@@ -150,6 +189,7 @@ const ApplicationForm = () => {
   };
 
   return (
+
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
         <div className="p-8">

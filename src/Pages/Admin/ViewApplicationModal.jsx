@@ -40,7 +40,7 @@ const ViewApplicationModal = ({ isOpen, onClose, application }) => {
             <span className="font-semibold text-gray-700">Image:</span>
             <span>
               {application.image ? (
-                <img src={application.image} alt="Uploaded" className="w-24 h-24 object-cover rounded-lg shadow-md" />
+               <img src={`http://localhost:5000/${application.image}`} alt="Uploaded"  className="w-24 h-24 object-cover rounded-lg shadow-md" />
               ) : (
                 "No image uploaded"
               )}
