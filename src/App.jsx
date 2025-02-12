@@ -1,12 +1,12 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { MantineProvider } from '@mantine/core';
+import { MantineProvider } from "@mantine/core";
 import "./App.css";
 import Home from "./Pages/Home/Home";
 import Login from "./Pages/Auth/Login";
 import SignUp from "./Pages/Auth/SignUp";
 import Contact from "./Pages/Contact/Contact";
 import Blog from "./Pages/Blog/Blog";
-import BlogDetails from './Pages/Blog/BlogDetails'
+import BlogDetails from "./Pages/Blog/BlogDetails";
 import About from "./Pages/About/About";
 import Applications from "./Pages/Apply/Apply";
 import Eventss from "./Pages/Eventss/Eventss";
@@ -38,9 +38,8 @@ import IdCard from "./Pages/IdCard/IdCard";
 import Course from "./Pages/Blog/Course";
 import SignUpModal from "./Pages/Auth/SignUpModal";
 import ApplicationManagement from "./Pages/Admin/ApplicationManagement";
+import ConfirmOfflinePayments from "./Pages/Admin/ConfirmOfflinePayments";
 // import InstiEvent from "./Pages/InstiEvent/InstiEvent";
-
-
 
 function App() {
   return (
@@ -50,8 +49,7 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
-            <Route path="/login"
-              element={<Login />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/course" element={<Course />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -61,7 +59,7 @@ function App() {
             <Route path="/blog/:id" element={<BlogDetails />} />
             <Route path="/about" element={<About />} />
             <Route path="/apply" element={<Applications />} />
-            <Route path="/admin-application" element={<ApplicationManagement />} />
+
             <Route path="/events" element={<Eventss />} />
 
             {/* Private Routes */}
@@ -97,6 +95,22 @@ function App() {
                 element={
                   <DashboardLayout>
                     <AdminDashboard />
+                  </DashboardLayout>
+                }
+              />
+              <Route
+                path="/admin-application"
+                element={
+                  <DashboardLayout>
+                    <ApplicationManagement />
+                  </DashboardLayout>
+                }
+              />
+              <Route
+                path="/payments"
+                element={
+                  <DashboardLayout>
+                    <ConfirmOfflinePayments />
                   </DashboardLayout>
                 }
               />
@@ -183,17 +197,11 @@ function App() {
                 }
               />
 
-
-
-
-
-
-
-
-
-
               {/* Institution Dashboard Routes */}
-              <Route path="/institution-dashboard" element={<InstitutionDashboardLayout />}>
+              <Route
+                path="/institution-dashboard"
+                element={<InstitutionDashboardLayout />}
+              >
                 <Route index element={<InstitutionDashboard />} />
                 <Route path="members" element={<MembersManagement />} />
                 <Route path="communication" element={<Insti_Communication />} />
@@ -201,12 +209,11 @@ function App() {
                 <Route path="analytics" element={<Insti_Analytics />} />
               </Route>
             </Route>
-
-
           </Routes>
         </BrowserRouter>
       </AuthProvider>
-      /</MantineProvider>
+      /
+    </MantineProvider>
   );
 }
 

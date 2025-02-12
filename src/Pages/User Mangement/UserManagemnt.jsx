@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
 import { fechUser } from '../../api/general'; 
-import { deleteuser } from '../../api/auth';
+import { deleteuser, updateUser } from '../../api/auth';
 import { FaEdit } from 'react-icons/fa';
 
 function UserManagemnt() {
@@ -12,6 +11,8 @@ function UserManagemnt() {
   const [success, setSuccess] = useState('');
   const [deletingUserId, setDeletingUserId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -35,6 +36,15 @@ function UserManagemnt() {
     }
   }, [success]);
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError('');
+      }, 5000); 
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   const handleDeleteUser = (id) => {
     console.log("Delete user ID:", id);
     setIsModalOpen(true);
@@ -49,6 +59,26 @@ function UserManagemnt() {
       setIsModalOpen(false); 
     } catch (error) {
       setError('Failed to delete user');
+    }
+  };
+
+  const handleEditUser = (user) => {
+    setCurrentUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const confirmUpdateUser = async () => {
+    try {
+      await updateUser(currentUser._id, {
+        name: currentUser.name,
+        email: currentUser.email,
+        role: currentUser.role
+      });
+      setMembers(members.map(member => (member._id === currentUser._id ? currentUser : member)));
+      setSuccess('User updated successfully!');
+      setIsEditModalOpen(false);
+    } catch (error) {
+      setError('Failed to update user: ' + error.message);
     }
   };
 
@@ -118,15 +148,10 @@ function UserManagemnt() {
                   {member.deleted ? (
                     <span className="text-gray-400">Deleted</span>
                   ) : (
-                    <button onClick={() => handleDeleteUser(member._id)} className="text-red-600 ml-4">Delete</button>
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {member.edited ? (
-                    <span className="text-gray-400">Updated</span>
-                  ) : (
-                    <FaEdit />
-                    // <button onClick={() => handleDeleteUser(member._id)} className="text-green-600 ml-4">Update</button>
+                    <>
+                      <button onClick={() => handleEditUser(member)} className="text-green-600 ml-4"><FaEdit /></button>
+                      <button onClick={() => handleDeleteUser(member._id)} className="text-red-600 ml-4">Delete</button>
+                    </>
                   )}
                 </td>
               </tr>
@@ -142,6 +167,39 @@ function UserManagemnt() {
             <div className="flex justify-end mt-4">
               <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 mr-4 text-gray-600 bg-gray-200 rounded-lg">Cancel</button>
               <button onClick={confirmDeleteUser} className="px-4 py-2 text-white bg-red-600 rounded-lg">Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 className="text-lg font-semibold">Edit User</h3>
+            <input
+              type="text"
+              placeholder="Name"
+              className="border rounded-lg p-2 w-full mb-2"
+              value={currentUser.name}
+              onChange={(e) => setCurrentUser({ ...currentUser, name: e.target.value })}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              className="border rounded-lg p-2 w-full mb-2"
+              value={currentUser.email}
+              onChange={(e) => setCurrentUser({ ...currentUser, email: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Role"
+              className="border rounded-lg p-2 w-full mb-2"
+              value={currentUser.role}
+              onChange={(e) => setCurrentUser({ ...currentUser, role: e.target.value })}
+            />
+            <div className="flex justify-end mt-4">
+              <button onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 mr-4 text-gray-600 bg-gray-200 rounded-lg">Cancel</button>
+              <button onClick={confirmUpdateUser} className="px-4 py-2 text-white bg-blue-600 rounded-lg">Update</button>
             </div>
           </div>
         </div>

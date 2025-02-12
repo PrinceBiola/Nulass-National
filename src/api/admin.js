@@ -29,4 +29,16 @@ export const exportApplications = async () => {
 export const getApplicationStats = async () => {
   const response = await axios.get(`${API_URL}/api/admin/applications/stats`);
   return response.data;
+};
+
+// Function to get all payments (both online and offline)
+export const getAllPayments = async () => {
+  const response = await axios.get('/api/payments/all'); // Adjust the endpoint as necessary
+  return response.data; // Return the data from the response
+};
+
+// Function to confirm payment
+export const confirmPayment = async (paymentId) => {
+  const response = await axios.post(`/api/payments/confirm/${paymentId}`); // Adjust the endpoint as necessary
+  return response.data; // Return the updated application data
 }; 

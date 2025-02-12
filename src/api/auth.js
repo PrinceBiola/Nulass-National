@@ -29,3 +29,13 @@ export const deleteuser = async ({ id }) => {
     }
 };
 
+export const updateUser = async (userId, userData) => {
+    try {
+        const response = await axios.put(`${API_URL}/users/${userId}`, userData);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating user:', error);
+        throw error;
+    }
+};
+

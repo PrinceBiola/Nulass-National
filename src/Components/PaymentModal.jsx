@@ -24,7 +24,7 @@ const PaymentModal = ({ isOpen, onClose, applicationData, onPaymentSuccess }) =>
   const bankDetails = {
     bankName: "First Bank",
     accountNumber: "0123456789",
-    accountName: "NULLAS Student ID",
+    accountName: "NULLAS Member ID",
     amount: "₦5,000"
   };
 
@@ -144,7 +144,7 @@ const PaymentModal = ({ isOpen, onClose, applicationData, onPaymentSuccess }) =>
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-md rounded-xl bg-white p-6">
             <Dialog.Title className="text-xl font-semibold mb-4">
-              Payment for Student ID Application
+              Payment for Member ID Application
             </Dialog.Title>
 
             <div className="mb-4">

@@ -28,21 +28,43 @@ function DashboardLayout({ children }) {
       path: "/dashboard",
       icon: FaHome,
       label: "Dashboard",
-      roles: ["admin", "student", "superadmin", "intitution"],
+      roles: ["admin", "member", "superadmin", "intitution"],
       bgColor: "from-blue-400 to-blue-600"
     },
     {
       path: "/application",
       icon: FaUserAlt,
       label: "Application",
-      roles: ["student", "admin"],
+      roles: ["member"],
+      bgColor: "from-purple-400 to-purple-600"
+    },
+    
+    // {
+    //   path: "/application",
+    //   icon: FaUserAlt,
+    //   label: "Application",
+    //   roles: ["member"],
+    //   bgColor: "from-purple-400 to-purple-600"
+    // },
+    {
+      path: "/admin-application",
+      icon: FaUsers,
+      label: "Application Management",
+      roles: [ "admin"],
+      bgColor: "from-purple-400 to-purple-600"
+    },
+    {
+      path: "/payments",
+      icon: FaMoneyBillWave,
+      label: "Payments",
+      roles: ["admin"],
       bgColor: "from-purple-400 to-purple-600"
     },
     {
       path: "/idcard",
       icon: FaIdCard,
       label: "ID Card",
-      roles: ["student"],
+      roles: ["member"],
       bgColor: "from-pink-400 to-pink-600"
     },
     {
@@ -55,11 +77,11 @@ function DashboardLayout({ children }) {
     { path: "/dashboard/blog", icon: FaBlog, label: "Blog Management", roles: ["admin"], bgColor: "from-green-400 to-green-600" },
     { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", , "institution"], bgColor: "from-green-400 to-green-600" },
     { path: "/dashboard/finance", icon: FaMoneyBillWave, label: "Financials", roles: ["admin", "superadmin"], bgColor: "from-green-400 to-green-600" },
-    { path: "/dashboard/analytics", icon: FaChartBar, label: "Analytics", roles: ["admin", "student"] },
+    { path: "/dashboard/analytics", icon: FaChartBar, label: "Analytics", roles: ["admin", "member"] },
     // { path: "/dashboard/messages", icon: FaEnvelope, label: "Communication", roles: ["admin"], bgColor: "from-green-400 to-green-600" },
     // { path: "/dashboard/settings", icon: FaCog, label: "Settings", roles: ["admin"], bgColor: "from-green-400 to-green-600" },
-    { path: "/profile", icon: FaUserCircle, label: "Profile", roles: ["admin", "student", "institution", "superadmin"], bgColor: "from-green-400 to-green-600" },
-    // { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", "student", "institution"] },
+    { path: "/profile", icon: FaUserCircle, label: "Profile", roles: ["admin", "member", "institution", "superadmin"], bgColor: "from-green-400 to-green-600" },
+    // { path: "/dashboard/events", icon: FaCalendarAlt, label: "Events", roles: ["admin", "member", "institution"] },
   ];
 
 

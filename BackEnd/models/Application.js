@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
 
-const ApplicationSchema = mongoose.Schema({
+const applicationSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },
-  phoneNumber: { type: String, required: true },
-  NIN: { type: String, required: false },
+  phoneNumber: { type: Number, required: true },
+  NIN: { type: Number, required: false },
   institution: { type: String, required: true },
   department: { type: String, required: true },
-  level: { type: String, required: true },
-  matricNumber: { type: String, required: true },
+  level: { type: Number, required: true },
+  matricNumber: { type: Number, required: true },
   address: { type: String, required: true },
   lgaOfOrigin: { type: String, required: true },
   stateOfResidence: { type: String, required: true },
@@ -22,4 +22,4 @@ const ApplicationSchema = mongoose.Schema({
   image: { type: String, required: false },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Application', ApplicationSchema);
+module.exports = mongoose.model('Application', applicationSchema);
