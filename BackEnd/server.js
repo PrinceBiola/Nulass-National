@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const applicationRoutes = require('./routes/applicationRoutes'); // Adjust the path as necessary
 
 // Load environment variables
 dotenv.config();
@@ -21,6 +23,12 @@ app.use('/api', require('./controllers/generalController'));
 app.use('/api/auth', require('./controllers/authController'));
 app.use('/api/admin', require('./controllers/adminController'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
+app.use('/api/applications', applicationRoutes);
+
+// Connect to MongoDB
+mongoose.connect('your_mongo_db_connection_string', { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // Start server
 const PORT = process.env.PORT || 5000;

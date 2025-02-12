@@ -1,8 +1,8 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
 import PaystackButton from '../../Components/PaystackButton';
-import { ApplyUser } from '../../api/general';
+import { ApplyUser, getUserApplication } from '../../api/general';
 import UploadFormInput from '../../Components/UploadFormInput/UploadFormInput';
 import UploadFormTextarea from '../../Components/UploadFormInput/UploadFormTextarea';
 // import PaymentModal from './PaymentModal';
@@ -37,14 +37,47 @@ const ApplicationForm = () => {
   });
 
   const [applicationData, setApplicationData] = useState(null);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const [errorMessages, setErrorMessages] = useState({});
+
+  useEffect(() => {
+    // Fetch the user's application status when the component mounts
+    const fetchApplicationStatus = async () => {
+      try {
+        const response = await getUserApplication(user._id, token); // Fetch the application data
+        if (response.data) {
+          setApplicationData(response.data.application);
+        }
+      } catch (error) {
+        console.error('Error fetching application status:', error);
+      }
+    };
+
+    fetchApplicationStatus();
+  }, [user, token]);
 
   const handleChange = (name, value) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    if (isNaN(formData.phoneNumber) || formData.phoneNumber.trim() === '') {
+      errors.phoneNumber = 'Phone number must be a valid number.';
+    }
+    if (formData.NIN && (isNaN(formData.NIN) || formData.NIN.trim() === '')) {
+      errors.NIN = 'NIN must be a valid number.';
+    }
+    if (isNaN(formData.level) || formData.level.trim() === '') {
+      errors.level = 'Level must be a valid number.';
+    }
+    if (isNaN(formData.matricNumber) || formData.matricNumber.trim() === '') {
+      errors.matricNumber = 'Matric number must be a valid number.';
+    }
+    setErrorMessages(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const uploadImage = (e) => {
@@ -60,13 +93,22 @@ const ApplicationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
     try {
       const formDataToSend = new FormData();
       Object.keys(formData).forEach(key => {
-        formDataToSend.append(key, formData[key]);
+        if (key === 'phoneNumber' || key === 'NIN' || key === 'level' || key === 'matricNumber') {
+          formDataToSend.append(key, Number(formData[key]));
+        } else {
+          formDataToSend.append(key, formData[key]);
+        }
       });
 
       formDataToSend.append('user', user._id);
+      formDataToSend.append('paymentStatus', 'pending');
+      formDataToSend.append('paymentMethod', 'offline');
 
       const imageFile = document.getElementById('imageUpload').files[0];
       if (imageFile) {
@@ -151,8 +193,8 @@ const ApplicationForm = () => {
             </div>
           </div>
 
-          {currentStep === 3 ? (
-            // Confirmation Step
+          {applicationData ? (
+            // Show application status if application exists
             <div className="text-center py-8">
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <CheckCheckIcon className="w-8 h-8 text-green-500" />
@@ -251,6 +293,7 @@ const ApplicationForm = () => {
                       onChange={(e) => handleChange('phoneNumber', e.target.value)}
                       name="phoneNumber"
                       required
+                      errorMessage={errorMessages.phoneNumber}
                     />
                     <UploadFormInput
                       label="NIN"
@@ -259,6 +302,7 @@ const ApplicationForm = () => {
                       onChange={(e) => handleChange('NIN', e.target.value)}
                       name="NIN"
                       required
+                      errorMessage={errorMessages.NIN}
                     />
                     <UploadFormInput
                       label="Institution"
@@ -283,6 +327,7 @@ const ApplicationForm = () => {
                       onChange={(e) => handleChange('level', e.target.value)}
                       name="level"
                       required
+                      errorMessage={errorMessages.level}
                     />
                     <UploadFormInput
                       label="Matric Number"
@@ -291,6 +336,7 @@ const ApplicationForm = () => {
                       onChange={(e) => handleChange('matricNumber', e.target.value)}
                       name="matricNumber"
                       required
+                      errorMessage={errorMessages.matricNumber}
                     />
                     <UploadFormInput
                       label="Address"

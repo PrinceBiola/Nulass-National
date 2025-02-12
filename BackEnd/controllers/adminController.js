@@ -4,6 +4,7 @@ const Application = require('../models/Application');
 const { protect, admin } = require('../middleware/authMiddleware');
 const { sendEmail } = require('../utils/email');
 const excel = require('exceljs');
+const User = require('../models/User');
 
 // Get all applications
 router.get('/applications',   async (req, res) => {
@@ -144,6 +145,22 @@ router.get('/applications/stats', protect, admin, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+});
+
+router.patch('/users/:id', protect, admin, async (req, res) => {
+    const { id } = req.params;
+    const { name, email, role } = req.body;
+
+    try {
+        const updatedUser = await User.findByIdAndUpdate(id, { name, email, role }, { new: true, runValidators: true });
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ message: error.message });
+    }
 });
 
 module.exports = router; 

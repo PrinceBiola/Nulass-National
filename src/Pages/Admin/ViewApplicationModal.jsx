@@ -1,155 +1,83 @@
-import React from 'react';
-import { Dialog as HeadlessDialog } from '@headlessui/react';
-import { formatDate } from '../../Helper/helper';
-// import { formatDate } from '../../utils/helpers';
+import React from "react";
+import Modal from "react-modal";
 
 const ViewApplicationModal = ({ isOpen, onClose, application }) => {
   if (!application) return null;
 
-  return (
-    <HeadlessDialog 
-      open={isOpen} 
-      onClose={onClose} 
-      className="fixed z-10 inset-0 overflow-y-auto"
-    >
-      <div className="flex items-center justify-center min-h-screen">
-        <HeadlessDialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+  console.log(application); // Check if the application data is correct
 
-        <div className="relative bg-white rounded-lg max-w-4xl w-full mx-4 p-6">
-          <div className="flex justify-between items-start mb-6">
-            <HeadlessDialog.Title className="text-2xl font-bold">
-              Application Details
-            </HeadlessDialog.Title>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+  return (
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onClose}
+      ariaHideApp={false}
+      className="max-w-2xl mx-auto my-10 p-6 bg-white rounded-lg shadow-2xl overflow-hidden"
+      overlayClassName="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center"
+    >
+      <div className="max-h-[80vh] overflow-y-auto p-4">
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Application Details</h2>
+        <div className="space-y-4 divide-y divide-gray-300">
+          {[
+            ["Name", `${application.firstName} ${application.lastName}`],
+            ["Email", application.email],
+            ["Phone Number", application.phoneNumber],
+            ["NIN", application.NIN],
+            ["Institution", application.institution],
+            ["Department", application.department],
+            ["Level", application.level],
+            ["Matric Number", application.matricNumber],
+            ["Address", application.address],
+            ["LGA of Origin", application.lgaOfOrigin],
+            ["State of Residence", application.stateOfResidence],
+          ].map(([label, value]) => (
+            <div key={label} className="flex justify-between py-2">
+              <span className="font-semibold text-gray-700">{label}:</span>
+              <span className="text-gray-900">{value}</span>
+            </div>
+          ))}
+
+          <div className="flex justify-between py-2">
+            <span className="font-semibold text-gray-700">Image:</span>
+            <span>
+              {application.image ? (
+                <img src={application.image} alt="Uploaded" className="w-24 h-24 object-cover rounded-lg shadow-md" />
+              ) : (
+                "No image uploaded"
+              )}
+            </span>
+          </div>
+          
+          <div className="flex justify-between py-2">
+            <span className="font-semibold text-gray-700">Status:</span>
+            <span className={`px-3 py-1 rounded-full text-sm font-medium shadow-md ${
+              application.status === 'approved' ? 'bg-green-200 text-green-800' :
+              application.status === 'rejected' ? 'bg-red-200 text-red-800' :
+              'bg-yellow-200 text-yellow-800'
+            }`}>
+              {application.status}
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Personal Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold border-b pb-2">Personal Information</h3>
-              
-              <div className="flex items-center justify-center mb-4">
-                <img 
-                  src={application.image} 
-                  alt="Applicant" 
-                  className="w-32 h-32 rounded-lg object-cover"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Full Name</label>
-                  <p className="mt-1">{`${application.firstName} ${application.lastName}`}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Email</label>
-                  <p className="mt-1">{application.email}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Phone</label>
-                  <p className="mt-1">{application.phoneNumber}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">NIN</label>
-                  <p className="mt-1">{application.NIN}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Academic Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold border-b pb-2">Academic Information</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Institution</label>
-                  <p className="mt-1">{application.institution}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Department</label>
-                  <p className="mt-1">{application.department}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Level</label>
-                  <p className="mt-1">{application.level}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Matric Number</label>
-                  <p className="mt-1">{application.matricNumber}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Payment Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold border-b pb-2">Payment Information</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Status</label>
-                  <span className={`inline-block mt-1 px-2 py-1 rounded-full text-sm ${
-                    application.paymentStatus === 'paid' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {application.paymentStatus}
-                  </span>
-                </div>
-                {application.paymentReference && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Reference</label>
-                    <p className="mt-1">{application.paymentReference}</p>
-                  </div>
-                )}
-              </div>
-              {application.paymentReceipt && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Receipt</label>
-                  <a 
-                    href={application.paymentReceipt} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    View Receipt
-                  </a>
-                </div>
-              )}
-            </div>
-
-            {/* Application Status */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold border-b pb-2">Application Status</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Status</label>
-                  <span className={`inline-block mt-1 px-2 py-1 rounded-full text-sm ${
-                    application.status === 'approved' ? 'bg-green-100 text-green-800' :
-                    application.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {application.status}
-                  </span>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Submitted On</label>
-                  <p className="mt-1">{formatDate(application.createdAt)}</p>
-                </div>
-              </div>
-              {application.rejectionReason && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Rejection Reason</label>
-                  <p className="mt-1 text-red-600">{application.rejectionReason}</p>
-                </div>
-              )}
-            </div>
+          <div className="flex justify-between py-2">
+            <span className="font-semibold text-gray-700">Payment Status:</span>
+            <span className={`px-3 py-1 rounded-full text-sm font-medium shadow-md ${
+              application.paymentStatus === 'paid' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
+            }`}>
+              {application.paymentStatus}
+            </span>
           </div>
         </div>
       </div>
-    </HeadlessDialog>
+      <div className="flex justify-center mt-6">
+        <button
+          onClick={onClose}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md"
+        >
+          Close
+        </button>
+      </div>
+    </Modal>
   );
 };
 
-export default ViewApplicationModal; 
+export default ViewApplicationModal;

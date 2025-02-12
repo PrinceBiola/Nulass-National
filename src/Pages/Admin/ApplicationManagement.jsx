@@ -50,6 +50,11 @@ const ApplicationManagement = () => {
     }
   };
 
+  const handleView = (app) => {
+    setSelectedApp(app);
+    setShowViewModal(true);
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -124,10 +129,7 @@ const ApplicationManagement = () => {
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
                     <button
-                      onClick={() => {
-                        setSelectedApp(app);
-                        setShowViewModal(true);
-                      }}
+                      onClick={() => handleView(app)}
                       className="text-blue-500 hover:text-blue-700"
                     >
                       View
