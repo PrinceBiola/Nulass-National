@@ -94,6 +94,7 @@ export default function Login() {
                 required
               />
             </div>
+            
             <div className="flex flex-col text-base md:text-lg font-semibold text-start">
               <label htmlFor="password">Password</label>
               <input

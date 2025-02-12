@@ -7,6 +7,7 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
+const { sendWelcomeEmail, sendVerificationEmail } = require('../utils/email');
 
 const transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST,
@@ -56,11 +57,14 @@ router.post('/register', async (req, res) => {
             role: user.role,
             token: generateToken(user),
         });
+        sendWelcomeEmail(user.email, user.name);
     } catch (error) {
         console.error('Register error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
+
+
 
 
 
@@ -133,6 +137,7 @@ router.post('/send-otp', async (req, res) => {
     const { email } = req.body;
     const otp = crypto.randomInt(100000, 999999).toString();
 
+    await sendVerificationEmail(email, otp);
     await transporter.sendMail({
         from: process.env.MAIL_FROM_ADDRESS,
         to: email,
