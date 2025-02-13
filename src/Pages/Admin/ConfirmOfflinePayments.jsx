@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { getAllPayments, confirmPayment } from '../../api/admin'; // Adjust the import based on your API structure
 import { toast } from 'react-toastify';
+import { useAuthContext } from '../../context/AuthContext';
 
 const ConfirmPayments = () => {
+    const {token} = useAuthContext();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -12,9 +14,9 @@ const ConfirmPayments = () => {
 
   const fetchAllPayments = async () => {
     try {
-      const data = await getAllPayments(); // Fetch all payments from the API
+      const data = await getAllPayments( token); 
       if (Array.isArray(data)) {
-        setPayments(data); // Set payments only if data is an array
+        setPayments(data); 
       } else {
         throw new Error('Unexpected response format'); // Handle unexpected response
       }
@@ -27,17 +29,11 @@ const ConfirmPayments = () => {
 
   const handleConfirmPayment = async (paymentId) => {
     try {
-      const updatedApplication = await confirmPayment(paymentId); // Confirm the payment using the API
-      toast.success('Payment confirmed successfully');
-      // Update the application status in the local state
-      setPayments((prevPayments) =>
-        prevPayments.map((payment) =>
-          payment._id === paymentId ? { ...payment, status: 'paid' } : payment
-        )
-      );
-      fetchAllPayments(); // Refresh the payment list
+      const response = await confirmPayment(paymentId); // Call the confirmPayment API
+      toast.success('Payment confirmed successfully!'); // Notify success
+      fetchAllPayments(); // Refresh payments after confirmation
     } catch (error) {
-      toast.error('Error confirming payment');
+      toast.error('Error confirming payment: ' + error.message); // Notify error
     }
   };
 

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import Logo from "../../assets/Images/Logo.png";
+import Modal from "react-modal";
 
-function IdCard() {
+function IdCard({ application }) {
   const [idNumber, setIdNumber] = useState("");
   const [generatedId, setGeneratedId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleInputChange = (e) => {
     setIdNumber(e.target.value);
@@ -12,6 +14,7 @@ function IdCard() {
   const generateIdCard = () => {
     if (idNumber.trim() !== "") {
       setGeneratedId(idNumber);
+      setIsModalOpen(true); // Open modal when ID is generated
     }
   };
 
@@ -39,9 +42,15 @@ function IdCard() {
         </button>
       </div>
 
-      {/* ID Card Preview */}
-      {generatedId && (
-        <div className="mt-8 bg-white w-full max-w-sm rounded-2xl shadow-xl p-6">
+      {/* ID Card Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        ariaHideApp={false}
+        className="max-w-2xl mx-auto my-10 p-6 bg-white rounded-lg shadow-2xl overflow-hidden"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center"
+      >
+        <div className="flex flex-col items-center">
           <div className="flex items-center border-b pb-4 mb-4">
             <img src={Logo} alt="Logo" className="w-14 h-14" />
             <div className="ml-4">
@@ -53,32 +62,32 @@ function IdCard() {
           <div className="flex flex-col items-center">
             <div className="w-24 h-24 bg-gray-200 rounded-full overflow-hidden mb-4">
               <img
-                src={Logo}
+                src={application?.image ? `http://localhost:5000/${application.image}` : Logo}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
             </div>
-            <p className="text-lg font-semibold text-gray-700">John Doe</p>
+            <p className="text-lg font-semibold text-gray-700">{`${application?.firstName} ${application?.lastName}`}</p>
             <p className="text-gray-500 text-sm font-medium mb-4">
               ID: {generatedId}
             </p>
             <p className="text-gray-500 text-sm font-medium">
-              Institution: Tai Solarin University of Education
+              Institution: {application?.institution}
             </p>
             <p className="text-gray-500 text-sm font-medium">
-              Matric Number: 20200204070
+              Matric Number: {application?.matricNumber}
             </p>
           </div>
 
-          {/* Download Button */}
+          {/* Close Button */}
           <button
             className="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg shadow-md font-semibold transition"
-            onClick={() => alert("Download functionality coming soon!")}
+            onClick={() => setIsModalOpen(false)}
           >
-            Download ID Card
+            Close
           </button>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const applicationSchema = new mongoose.Schema({
+const ApplicationSchema = mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
@@ -22,4 +22,4 @@ const applicationSchema = new mongoose.Schema({
   image: { type: String, required: false },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Application', applicationSchema);
+module.exports = mongoose.model('Application', ApplicationSchema);

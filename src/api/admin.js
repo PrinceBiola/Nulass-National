@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthContext } from '../context/AuthContext';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -33,7 +34,12 @@ export const getApplicationStats = async () => {
 
 // Function to get all payments (both online and offline)
 export const getAllPayments = async () => {
-  const response = await axios.get('/api/payments/all'); // Adjust the endpoint as necessary
+  const { token } = useAuthContext();
+  const response = await axios.get(`${API_URL}/api/applications`,{
+    headers: {
+      Authorization: `Bearer ${token}`, // Include the token in the headers
+    },
+  }); // Adjust the endpoint as necessary
   return response.data; // Return the data from the response
 };
 
