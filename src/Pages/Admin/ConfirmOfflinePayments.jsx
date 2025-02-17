@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllPayments, confirmPayment } from '../../api/admin'; // Adjust the import based on your API structure
+import { getAllPayments, confirmPayment } from '../../api/admin'; 
 import { toast } from 'react-toastify';
 import { useAuthContext } from '../../context/AuthContext';
 
@@ -14,7 +14,7 @@ const ConfirmPayments = () => {
 
   const fetchAllPayments = async () => {
     try {
-      const data = await getAllPayments( token); 
+      const data = await getAllPayments(token);
       if (Array.isArray(data)) {
         setPayments(data); 
       } else {
@@ -59,7 +59,7 @@ const ConfirmPayments = () => {
           <tbody>
             {payments.map((payment) => (
               <tr key={payment._id} className="border-b hover:bg-gray-50">
-                <td className="px-6 py-4">{payment.name}</td>
+                <td className="px-6 py-4">{payment.firstName}</td>
                 <td className="px-6 py-4">{payment.email}</td>
                 <td className="px-6 py-4">{payment.amount}</td>
                 <td className="px-6 py-4">{payment.method}</td>

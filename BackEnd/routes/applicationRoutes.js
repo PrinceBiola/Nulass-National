@@ -12,4 +12,10 @@ router.post('/upload-receipt', upload, uploadPaymentReceipt);
 // Route to review payment
 router.put('/review-payment/:id', reviewPayment);
 
+// Route to get all payments
+router.get('/payments', getAllPayments);
+
+// Route to confirm payment
+router.post('/confirm-payment/:paymentId', confirmPayment);
+
 module.exports = router; 

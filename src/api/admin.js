@@ -33,18 +33,17 @@ export const getApplicationStats = async () => {
 };
 
 // Function to get all payments (both online and offline)
-export const getAllPayments = async () => {
-  const { token } = useAuthContext();
-  const response = await axios.get(`${API_URL}/api/applications`,{
+export const getAllPayments = async (token) => {
+  const response = await axios.get(`${API_URL}/api/applications/payments`, {
     headers: {
-      Authorization: `Bearer ${token}`, // Include the token in the headers
+      Authorization: `Bearer ${token}`,
     },
-  }); // Adjust the endpoint as necessary
-  return response.data; // Return the data from the response
+  });
+  return response.data;
 };
 
 // Function to confirm payment
 export const confirmPayment = async (paymentId) => {
-  const response = await axios.post(`/api/payments/confirm/${paymentId}`); // Adjust the endpoint as necessary
+  const response = await axios.post(`${API_URL}/api/payments/confirm/${paymentId}`); // Adjust the endpoint as necessary
   return response.data; // Return the updated application data
 }; 
