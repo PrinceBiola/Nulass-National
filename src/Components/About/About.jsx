@@ -24,7 +24,7 @@ function About() {
               />
             </div>
             {/* Decorative Element */}
-            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-customGreen rounded-xl -z-10"></div>
+            {/* <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-customGreen rounded-xl -z-10"></div> */}
           </div>
 
           {/* Content Section */}
