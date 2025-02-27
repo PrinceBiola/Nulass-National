@@ -10,7 +10,9 @@ require('dotenv').config();
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
 const { verifyPayment } = require('../utils/paystack');
+const { eventImage, handleUploadError } = require('../middleware/uploadMiddleware');
 const multer = require('multer'); // Add multer for file uploads
+const { deleteFile } = require('../utils/fileUtils');
 
 // Create a new blog
 
@@ -126,13 +128,12 @@ router.delete('/blogs/:id', async (req, res) => {
 
 router.get('/events', async (req, res) => {
     try {
-        const events = await Event.find();
+        const events = await Event.find().sort({ date: 1 });
         res.status(200).json(events);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
-
 
 router.get('/events/:id', async (req, res) => {
     try {
@@ -144,55 +145,96 @@ router.get('/events/:id', async (req, res) => {
     }
 });
 
-
-router.put('/events/:id', async (req, res) => {
-    try {
-        const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!event) return res.status(404).json({ message: 'Event not found' });
-        res.status(200).json(event);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-});
-
 router.delete('/events/:id', async (req, res) => {
     try {
-        const event = await Event.findByIdAndDelete(req.params.id);
-        if (!event) return res.status(404).json({ message: 'Event not found' });
-        res.status(204).send();
+        const event = await Event.findById(req.params.id);
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        // Delete the image file if it exists
+        if (event.image) {
+            await deleteFile(event.image.replace(/^\//, '')); // Remove leading slash
+        }
+
+        // Delete the event from database
+        await event.deleteOne();
+        
+        res.status(200).json({ message: 'Event deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
-
-router.post('/events', async (req, res) => {
+router.put('/events/:id', async (req, res) => {
     try {
-        const event = new Event({
+        const updateData = {
             title: req.body.title,
             description: req.body.description,
-            category: req.body.category,
             date: req.body.date,
+            time: req.body.time,
+            category: req.body.category,
             location: req.body.location,
-            createdAt: req.body.createdAt,
-            image: req.body.image,
-            author: req.body.author,
-        });
-        await event.save();
-        res.status(201).json(event);
+            image: req.body.image
+        };
+
+        const event = await Event.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        res.status(200).json(event);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            res.status(400).json({ message: messages.join(', ') });
+        } else {
+            res.status(400).json({ message: error.message });
+        }
     }
 });
 
-router.get('/events', async (req, res) => {
+router.post('/events', async (req, res) => {
     try {
-        const events = await Event.find();
+        const eventData = {
+            title: req.body.title,
+            description: req.body.description,
+            date: req.body.date,
+            time: req.body.time,
+            category: req.body.category,
+            location: req.body.location,
+            image: req.body.image
+        };
+
+        const event = new Event(eventData);
+        const savedEvent = await event.save();
+        res.status(201).json(savedEvent);
+    } catch (error) {
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            res.status(400).json({ message: messages.join(', ') });
+        } else {
+            res.status(400).json({ message: error.message });
+        }
+    }
+});
+
+router.get('/events/latest', async (req, res) => {
+    try {
+        const events = await Event.find()
+            .sort({ date: 1 })
+            .limit(3);
         res.status(200).json(events);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
+
 router.get('/users', async (req, res) => {
     try {
         const users = await User.find();
@@ -201,7 +243,6 @@ router.get('/users', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-
 
 router.delete('/users/:id', async (req, res) => {
     try {

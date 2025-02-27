@@ -10,12 +10,17 @@ function Eventss() {
   const [events, setEvents] = useState([]); 
   const [error, setError] = useState(null);
 
-  
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const fetchedEvents = await fetchEvents(); 
-        setEvents(fetchedEvents);
+        const fetchedEvents = await fetchEvents();
+        // Convert date strings to Date objects
+        const formattedEvents = fetchedEvents.map(event => ({
+          ...event,
+          date: new Date(event.date),
+          time: new Date(event.time)
+        }));
+        setEvents(formattedEvents);
       } catch (error) {
         setError("Failed to fetch events.");
         console.error(error);
@@ -24,19 +29,34 @@ function Eventss() {
     loadEvents();
   }, []);
 
+  const categories = ["all", ...new Set(events.map((event) => event.category))];
 
-  // const filteredEvents = events.filter(event => {
-  //   const matchesFilter =
-  //     activeFilter === 'all' || event.category === activeFilter || event.status === activeFilter;
-  //   const matchesSearch =
-  //     event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     event.description.toLowerCase().includes(searchQuery.toLowerCase());
-  //   return matchesFilter && matchesSearch;
-  // });
+  const filteredEvents = activeFilter === "all" 
+    ? events 
+    : events.filter(event => event.category === activeFilter);
 
-  const categories = ["all", ...new Set(events.map((events) => events.category))];
+  const formatDate = (date) => {
+    try {
+      return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return 'Date not available';
+    }
+  };
 
-  const Filteredevents  = activeFilter === "all" ? events : events.filter(event => event.category === activeFilter)
+  const formatTime = (time) => {
+    try {
+      return new Date(time).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return 'Time not available';
+    }
+  };
 
   return (
     <NavWrapper>
@@ -86,7 +106,7 @@ function Eventss() {
 
           {/* Events Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Filteredevents.map((event, index) => (
+            {filteredEvents.map((event, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -119,11 +139,11 @@ function Eventss() {
                   <div className="space-y-2 text-sm text-gray-500 mb-4">
                     <div className="flex items-center gap-2">
                       <FaCalendarAlt className="text-green-500" />
-                      <span>{event.date.toLocaleDateString()}</span>
+                      <span>{formatDate(event.date)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <FaClock className="text-green-500" />
-                      <span>{event.time.toLocaleTimeString()}</span>
+                      <span>{formatTime(event.time)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <FaMapMarkerAlt className="text-green-500" />
@@ -140,7 +160,7 @@ function Eventss() {
           </div>
 
           {/* No Results Message */}
-          {Filteredevents.length === 0 && !error && (
+          {filteredEvents.length === 0 && !error && (
             <div className="text-center py-12">
               <p className="text-gray-600 text-lg">
                 No events found matching your criteria.

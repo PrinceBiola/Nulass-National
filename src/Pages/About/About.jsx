@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 import NavWrapper from "../../Components/NavWrapper";
+import { FaLinkedin, FaTwitter, FaEnvelope } from 'react-icons/fa';
+import abiodun from '../../assets/Images/abiodun.jpg';
+import hamid from '../../assets/Images/hamid.jpg';
+import ajoke from '../../assets/Images/ajoke.jpg';
+import bambo from '../../assets/Images/Bambo.jpg';
+import { motion } from 'framer-motion';
 
 export default function About() {
   const [activeTab, setActiveTab] = useState("values");
@@ -90,6 +96,49 @@ export default function About() {
     }
   };
 
+  const leadershipTeam = [
+    {
+      name: "ABIODUN F. OLUSANYA",
+      role: "Assistant General Secretary",
+      image: abiodun,
+      socials: {
+        linkedin: "#",
+        twitter: "#",
+        email: "mailto:abiodun@nulass.org"
+      }
+    },
+    {
+      name: "Oyekunle Abdulhamid Opeyemi",
+      role: "Financial Secretary",
+      image: hamid,
+      socials: {
+        linkedin: "#",
+        twitter: "#",
+        email: "mailto:hamid@nulass.org"
+      }
+    },
+    {
+      name: "Ajoke Fatiah",
+      role: "Treasurer",
+      image: ajoke,
+      socials: {
+        linkedin: "#",
+        twitter: "#",
+        email: "mailto:ajoke@nulass.org"
+      }
+    },
+    {
+      name: "Remilekun Bambo",
+      role: "General Secretary",
+      image: bambo,
+      socials: {
+        linkedin: "#",
+        twitter: "#",
+        email: "mailto:bambo@nulass.org"
+      }
+    }
+  ];
+
   return (
     <NavWrapper>
       <div className="pt-32 md:pt-40 px-4 md:px-8 lg:px-20 pb-10">
@@ -156,6 +205,50 @@ export default function About() {
 
           <div className="bg-white p-6 md:p-8 rounded-lg shadow-lg">
             {renderContent()}
+          </div>
+        </div>
+
+        {/* Leadership Team Section */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Leadership Team</h2>
+            <p className="text-lg text-gray-600">Meet the dedicated individuals leading NULASS National</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {leadershipTeam.map((leader, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-xl shadow-lg overflow-hidden group"
+              >
+                <div className="relative overflow-hidden h-64">
+                  <img
+                    src={leader.image}
+                    alt={leader.name}
+                    className="w-full h-full object-cover object-center transform group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-4">
+                    <a href={leader.socials.linkedin} className="text-white hover:text-customGreen transition-colors">
+                      <FaLinkedin size={24} />
+                    </a>
+                    <a href={leader.socials.twitter} className="text-white hover:text-customGreen transition-colors">
+                      <FaTwitter size={24} />
+                    </a>
+                    <a href={leader.socials.email} className="text-white hover:text-customGreen transition-colors">
+                      <FaEnvelope size={24} />
+                    </a>
+                  </div>
+                </div>
+                <div className="p-6 text-center">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-1">{leader.name}</h3>
+                  <p className="text-customGreen font-medium">{leader.role}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </div>

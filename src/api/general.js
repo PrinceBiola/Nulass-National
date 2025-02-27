@@ -31,6 +31,36 @@ export const getUserApplication = async (userId, token) => {
     return response.data; 
 };
 
+// Generate QR Code for ID Card
+export const generateQRCode = async (data, token) => {
+    try {
+        const response = await axios.post(`${API_URL}/qrcode/generate`, data, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error generating QR code:', error);
+        throw error;
+    }
+};
+
+// Get User ID Card
+export const getUserIdCard = async (userId, token) => {
+    try {
+        const response = await axios.get(`${API_URL}/idcard/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching ID card:', error);
+        throw error;
+    }
+};
+
 
 
 

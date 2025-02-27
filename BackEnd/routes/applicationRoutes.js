@@ -1,21 +1,33 @@
 const express = require('express');
-const { getUserApplication, uploadPaymentReceipt, reviewPayment, getAllPayments, confirmPayment } = require('../controllers/applicationController'); // Adjust the path as necessary
-const upload = require('../middleware/uploadMiddleware'); // Import the upload middleware
 const router = express.Router();
+const { protect } = require('../middleware/authMiddleware');
+const { receipt } = require('../middleware/uploadMiddleware');
 
-// Route to get user application by ID
-router.get('/:id', getUserApplication);
+// Import controller functions
+const {
+  getUserApplication,
+  createApplication,
+  getApplications,
+  getApplicationById,
+  updateApplication,
+  deleteApplication,
+  uploadPaymentReceipt,
+  reviewPayment,
+  getAllPayments,
+  confirmPayment
+} = require('../controllers/applicationController');
 
-// Route to upload payment receipt
-router.post('/upload-receipt', upload, uploadPaymentReceipt);
+// Application routes
+router.get('/:id', protect, getUserApplication);
+router.post('/', protect, createApplication);
+router.get('/', protect, getApplications);
+router.put('/:id', protect, updateApplication);
+router.delete('/:id', protect, deleteApplication);
 
-// Route to review payment
-router.put('/review-payment/:id', reviewPayment);
-
-// Route to get all payments
-router.get('/payments', getAllPayments);
-
-// Route to confirm payment
-router.post('/confirm-payment/:paymentId', confirmPayment);
+// Payment routes
+router.post('/upload-receipt', protect, receipt, uploadPaymentReceipt);
+router.put('/review-payment/:id', protect, reviewPayment);
+router.get('/payments', protect, getAllPayments);
+router.post('/confirm-payment/:paymentId', protect, confirmPayment);
 
 module.exports = router; 

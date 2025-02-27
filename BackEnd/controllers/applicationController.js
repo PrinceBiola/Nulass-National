@@ -18,102 +18,165 @@ const getUserApplication = async (req, res) => {
   }
 };
 
+// Create new application
 const createApplication = async (req, res) => {
   try {
-    const newApplication = new Application({
-      user: req.body.user,
-      // Add other fields as necessary
+    const application = new Application({
+      ...req.body,
+      user: req.user._id
     });
-
-    const savedApplication = await newApplication.save();
+    const savedApplication = await application.save();
     res.status(201).json(savedApplication);
   } catch (error) {
-    console.error('Error creating application:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Get all applications
+const getApplications = async (req, res) => {
+  try {
+    const applications = await Application.find()
+      .populate('user', 'name email')
+      .sort('-createdAt');
+    res.status(200).json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get single application
+const getApplicationById = async (req, res) => {
+  try {
+    const application = await Application.findById(req.params.id)
+      .populate('user', 'name email');
+    
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+    
+    res.status(200).json(application);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update application
+const updateApplication = async (req, res) => {
+  try {
+    const application = await Application.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+
+    res.status(200).json(application);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Delete application
+const deleteApplication = async (req, res) => {
+  try {
+    const application = await Application.findByIdAndDelete(req.params.id);
+    
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+
+    res.status(200).json({ message: 'Application deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
 // Controller to upload payment receipt
 const uploadPaymentReceipt = async (req, res) => {
   try {
-    const applicationId = req.body.applicationId; // Get application ID from request body
-    const receiptUrl = req.file.path; // Get the uploaded file path
+    if (!req.file) {
+      return res.status(400).json({ message: 'Receipt file is required' });
+    }
 
-    // Update the application with the receipt URL and set payment status to 'pending_verification'
-    const updatedApplication = await Application.findByIdAndUpdate(
-      applicationId,
-      { receipt: receiptUrl, paymentStatus: 'pending_verification' },
+    const application = await Application.findByIdAndUpdate(
+      req.body.applicationId,
+      {
+        receipt: `/uploads/receipts/${req.file.filename}`,
+        paymentStatus: 'pending_verification'
+      },
       { new: true }
     );
 
-    if (!updatedApplication) {
+    if (!application) {
       return res.status(404).json({ message: 'Application not found' });
     }
 
-    res.status(200).json({ message: 'Receipt uploaded successfully', application: updatedApplication });
+    res.status(200).json(application);
   } catch (error) {
-    console.error('Error uploading receipt:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(400).json({ message: error.message });
   }
 };
 
 // Controller to review payment
 const reviewPayment = async (req, res) => {
   try {
-    const applicationId = req.params.id;
-    const { status } = req.body; // Expecting status to be 'approved' or 'rejected'
-
-    const updatedApplication = await Application.findByIdAndUpdate(
-      applicationId,
-      { paymentStatus: status },
+    const application = await Application.findByIdAndUpdate(
+      req.params.id,
+      { paymentStatus: req.body.status },
       { new: true }
     );
 
-    if (!updatedApplication) {
+    if (!application) {
       return res.status(404).json({ message: 'Application not found' });
     }
 
-    res.status(200).json({ message: 'Payment status updated successfully', application: updatedApplication });
+    res.status(200).json(application);
   } catch (error) {
-    console.error('Error reviewing payment:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(400).json({ message: error.message });
   }
 };
 
 // Function to get all payments
 const getAllPayments = async (req, res) => {
   try {
-    const payments = await Application.find().select('paymentStatus'); // Adjust fields as necessary
+    const payments = await Application.find()
+      .select('paymentStatus receipt user createdAt')
+      .populate('user', 'name email');
     res.status(200).json(payments);
   } catch (error) {
-    console.error('Error fetching payments:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: error.message });
   }
 };
 
 // Function to confirm payment
 const confirmPayment = async (req, res) => {
   try {
-    const { paymentId } = req.params; // Get payment ID from request parameters
-    const application = await Application.findById(paymentId);
+    const application = await Application.findByIdAndUpdate(
+      req.params.paymentId,
+      { paymentStatus: 'confirmed' },
+      { new: true }
+    );
 
     if (!application) {
-      return res.status(404).json({ message: 'Payment not found' });
+      return res.status(404).json({ message: 'Application not found' });
     }
 
-    application.paymentStatus = 'confirmed'; // Update payment status
-    await application.save();
-
-    res.status(200).json({ message: 'Payment confirmed successfully', application });
+    res.status(200).json(application);
   } catch (error) {
-    console.error('Error confirming payment:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(400).json({ message: error.message });
   }
 };
 
 module.exports = {
   getUserApplication,
   createApplication,
+  getApplications,
+  getApplicationById,
+  updateApplication,
+  deleteApplication,
   uploadPaymentReceipt,
   reviewPayment,
   getAllPayments,
