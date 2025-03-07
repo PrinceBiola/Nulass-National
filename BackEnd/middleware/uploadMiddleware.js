@@ -4,25 +4,71 @@ const path = require('path');
 // Set storage engine
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Specify the directory to save uploaded files
+    // Different folders for different types of uploads
+    const uploadPath = file.fieldname === 'receipt' ? 'uploads/receipts' : 'uploads/events';
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`); // Create a unique filename
+    // Create unique filename with original extension
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
 });
 
-// Initialize upload
+// File filter function
+const fileFilter = (req, file, cb) => {
+  // Allowed file types
+  const filetypes = /jpeg|jpg|png|gif|webp/;
+  // Check extension
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  // Check mime type
+  const mimetype = filetypes.test(file.mimetype);
+
+  if (mimetype && extname) {
+    return cb(null, true);
+  } else {
+    cb(new Error('Only image files are allowed!'));
+  }
+};
+
+// Create multer upload instance
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
-  fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png|gif/; // Allowed file types
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    if (extname) {
-      return cb(null, true);
-    }
-    cb('Error: File type not supported');
-  }
-}).single('receipt'); // Expecting a field named 'receipt'
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: fileFilter
+});
 
-module.exports = upload; 
+// Export different upload middlewares
+module.exports = {
+  // For event images
+  eventImage: upload.single('image'),
+  
+  // For receipts
+  receipt: upload.single('receipt'),
+  
+  // For multiple images if needed
+  multipleImages: upload.array('images', 5),
+  
+  // Error handler
+  handleUploadError: (err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({
+          message: 'File is too large. Maximum size is 5MB'
+        });
+      }
+      return res.status(400).json({
+        message: err.message
+      });
+    }
+    
+    if (err) {
+      return res.status(400).json({
+        message: err.message
+      });
+    }
+    next();
+  }
+}; 

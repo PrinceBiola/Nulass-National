@@ -1,38 +1,72 @@
-const moogose = require('mongoose');
+const mongoose = require('mongoose');
 
-const eventSchema = new moogose.Schema({
+const eventSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true,
+        required: [true, 'Title is required'],
+        trim: true
     },
     description: {
         type: String,
-        required: true,
+        required: [true, 'Description is required'],
+        trim: true
     },
     date: {
         type: Date,
-        required: true,
+        required: [true, 'Date is required']
+    },
+    time: {
+        type: String,
+        required: [true, 'Time is required']
     },
     category: {
         type: String,
-        required: true,
+        required: [true, 'Category is required'],
+        enum: ['Workshop', 'Conference', 'Seminar', 'Meetup', 'Other']
     },
     location: {
         type: String,
-        required: true,
+        required: [true, 'Location is required'],
+        trim: true
     },
-    createdAt: {    
-        type: Date,
-        default: Date.now,
-    },
-    author: {
+    image: {
         type: String,
-        required: true,
+        required: [true, 'Image URL is required'],
+        validate: {
+            validator: function(v) {
+                try {
+                    new URL(v);
+                    return true;
+                } catch(error) {
+                    return false;
+                }
+            },
+            message: props => `${props.value} is not a valid URL!`
+        }
     },
-    image:{
+    status: {
         type: String,
-        required: true,
+        enum: ['upcoming', 'ended'],
+        default: 'upcoming'
     }
+}, {
+    timestamps: true // This adds createdAt and updatedAt automatically
 });
 
-module.exports = moogose.model('Event', eventSchema);
+// Add a pre-save hook to update status based on date
+eventSchema.pre('save', function(next) {
+    const currentDate = new Date();
+    const eventDate = new Date(this.date);
+    this.status = eventDate > currentDate ? 'upcoming' : 'ended';
+    next();
+});
+
+// Add a method to check if event is upcoming
+eventSchema.methods.isUpcoming = function() {
+    return new Date(this.date) > new Date();
+};
+
+// Add an index for better query performance
+eventSchema.index({ date: 1, status: 1 });
+
+module.exports = mongoose.model('Event', eventSchema);

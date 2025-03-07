@@ -1,21 +1,28 @@
 const express = require('express');
-const { getUserApplication, uploadPaymentReceipt, reviewPayment, getAllPayments, confirmPayment } = require('../controllers/applicationController'); // Adjust the path as necessary
-const upload = require('../middleware/uploadMiddleware'); // Import the upload middleware
 const router = express.Router();
+const { protect } = require('../middleware/authMiddleware');
 
-// Route to get user application by ID
-router.get('/:id', getUserApplication);
+// Import controller functions
+const {
+  getUserApplication,
+  createApplication,
+  getApplications,
+  getApplicationById,
+  updateApplication,
+  deleteApplication,
+  updateApplicationStatus,
+  verifyPayment,
+  getUserApplicationHistory
+} = require('../controllers/applicationController');
 
-// Route to upload payment receipt
-router.post('/upload-receipt', upload, uploadPaymentReceipt);
-
-// Route to review payment
-router.put('/review-payment/:id', reviewPayment);
-
-// Route to get all payments
-router.get('/payments', getAllPayments);
-
-// Route to confirm payment
-router.post('/confirm-payment/:paymentId', confirmPayment);
+// Application routes
+router.get('/user', protect, getUserApplication);
+router.post('/', protect, createApplication);
+router.get('/', protect, getApplications);
+router.put('/:id', protect, updateApplication);
+router.delete('/:id', protect, deleteApplication);
+router.put('/:id/status', protect, updateApplicationStatus);
+router.post('/:id/verify-payment', protect, verifyPayment);
+router.get('/history', protect, getUserApplicationHistory);
 
 module.exports = router; 

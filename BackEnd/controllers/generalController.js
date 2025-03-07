@@ -10,7 +10,9 @@ require('dotenv').config();
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
 const { verifyPayment } = require('../utils/paystack');
+const { eventImage, handleUploadError } = require('../middleware/uploadMiddleware');
 const multer = require('multer'); // Add multer for file uploads
+const { deleteFile } = require('../utils/fileUtils');
 
 // Create a new blog
 
@@ -126,13 +128,12 @@ router.delete('/blogs/:id', async (req, res) => {
 
 router.get('/events', async (req, res) => {
     try {
-        const events = await Event.find();
+        const events = await Event.find().sort({ date: 1 });
         res.status(200).json(events);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
-
 
 router.get('/events/:id', async (req, res) => {
     try {
@@ -144,55 +145,96 @@ router.get('/events/:id', async (req, res) => {
     }
 });
 
-
-router.put('/events/:id', async (req, res) => {
-    try {
-        const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!event) return res.status(404).json({ message: 'Event not found' });
-        res.status(200).json(event);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-});
-
 router.delete('/events/:id', async (req, res) => {
     try {
-        const event = await Event.findByIdAndDelete(req.params.id);
-        if (!event) return res.status(404).json({ message: 'Event not found' });
-        res.status(204).send();
+        const event = await Event.findById(req.params.id);
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        // Delete the image file if it exists
+        if (event.image) {
+            await deleteFile(event.image.replace(/^\//, '')); // Remove leading slash
+        }
+
+        // Delete the event from database
+        await event.deleteOne();
+        
+        res.status(200).json({ message: 'Event deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
-
-router.post('/events', async (req, res) => {
+router.put('/events/:id', async (req, res) => {
     try {
-        const event = new Event({
+        const updateData = {
             title: req.body.title,
             description: req.body.description,
-            category: req.body.category,
             date: req.body.date,
+            time: req.body.time,
+            category: req.body.category,
             location: req.body.location,
-            createdAt: req.body.createdAt,
-            image: req.body.image,
-            author: req.body.author,
-        });
-        await event.save();
-        res.status(201).json(event);
+            image: req.body.image
+        };
+
+        const event = await Event.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        res.status(200).json(event);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            res.status(400).json({ message: messages.join(', ') });
+        } else {
+            res.status(400).json({ message: error.message });
+        }
     }
 });
 
-router.get('/events', async (req, res) => {
+router.post('/events', async (req, res) => {
     try {
-        const events = await Event.find();
+        const eventData = {
+            title: req.body.title,
+            description: req.body.description,
+            date: req.body.date,
+            time: req.body.time,
+            category: req.body.category,
+            location: req.body.location,
+            image: req.body.image
+        };
+
+        const event = new Event(eventData);
+        const savedEvent = await event.save();
+        res.status(201).json(savedEvent);
+    } catch (error) {
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            res.status(400).json({ message: messages.join(', ') });
+        } else {
+            res.status(400).json({ message: error.message });
+        }
+    }
+});
+
+router.get('/events/latest', async (req, res) => {
+    try {
+        const events = await Event.find()
+            .sort({ date: 1 })
+            .limit(3);
         res.status(200).json(events);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
+
 router.get('/users', async (req, res) => {
     try {
         const users = await User.find();
@@ -201,7 +243,6 @@ router.get('/users', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-
 
 router.delete('/users/:id', async (req, res) => {
     try {
@@ -225,29 +266,37 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Update the apply route to check for existing applications
+// Update the apply route to allow multiple applications
 router.post('/apply', protect, upload.single('image'), async (req, res) => {
     const { firstName, lastName, phoneNumber, NIN, institution, department, level, matricNumber, address, lgaOfOrigin, stateOfResidence } = req.body;
 
     try {
-        // Check for existing application for this user
-        const existingApplication = await Application.findOne({ user: req.user._id });
-        if (existingApplication) {
-            return res.status(409).json({ 
-                message: 'You have already submitted an application. Only one application per user is allowed.' 
-            });
-        }
-
         // Check if the file was uploaded
         if (!req.file) {
             return res.status(400).json({ message: 'Image file is required' });
+        }
+
+        // Get the latest application number for this user
+        const latestApp = await Application.findOne(
+            { user: req.user._id },
+            { applicationNumber: 1 }
+        ).sort({ applicationNumber: -1 });
+
+        // Ensure applicationNumber is a valid number
+        const nextApplicationNumber = (latestApp && typeof latestApp.applicationNumber === 'number') 
+            ? latestApp.applicationNumber + 1 
+            : 1;
+
+        // Validate that we have a valid number
+        if (isNaN(nextApplicationNumber)) {
+            throw new Error('Failed to generate valid application number');
         }
 
         const application = new Application({
             user: req.user._id,
             firstName,
             lastName,
-            email: req.user.email, // Use email from authenticated user
+            email: req.user.email,
             phoneNumber,
             NIN,
             institution,
@@ -258,13 +307,16 @@ router.post('/apply', protect, upload.single('image'), async (req, res) => {
             lgaOfOrigin,
             stateOfResidence,
             image: req.file.path,
+            applicationNumber: nextApplicationNumber,
+            status: 'under_review',
+            paymentStatus: 'unpaid'
         });
 
-        await application.save();
+        const savedApplication = await application.save();
 
         const order = new Order({
             user: req.user._id,
-            application: application._id,
+            application: savedApplication._id,
             paymentStatus: 'unpaid',
             reference: null,
         });
@@ -280,10 +332,13 @@ router.post('/apply', protect, upload.single('image'), async (req, res) => {
 
         res.status(201).json({ 
             message: 'Application submitted successfully! Please proceed with payment.', 
-            application 
+            application: savedApplication
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Application submission error:', error);
+        res.status(500).json({ 
+            message: error.message || 'Failed to submit application. Please try again.' 
+        });
     }
 });
 
