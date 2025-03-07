@@ -80,9 +80,42 @@ const reviewPayment = async (req, res) => {
   }
 };
 
+// Function to get all payments
+const getAllPayments = async (req, res) => {
+  try {
+    const payments = await Application.find().select('paymentStatus'); // Adjust fields as necessary
+    res.status(200).json(payments);
+  } catch (error) {
+    console.error('Error fetching payments:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Function to confirm payment
+const confirmPayment = async (req, res) => {
+  try {
+    const { paymentId } = req.params; // Get payment ID from request parameters
+    const application = await Application.findById(paymentId);
+
+    if (!application) {
+      return res.status(404).json({ message: 'Payment not found' });
+    }
+
+    application.paymentStatus = 'confirmed'; // Update payment status
+    await application.save();
+
+    res.status(200).json({ message: 'Payment confirmed successfully', application });
+  } catch (error) {
+    console.error('Error confirming payment:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   getUserApplication,
   createApplication,
   uploadPaymentReceipt,
   reviewPayment,
+  getAllPayments,
+  confirmPayment,
 }; 
