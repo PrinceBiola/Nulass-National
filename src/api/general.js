@@ -21,14 +21,33 @@ export const ApplyUser = async (data, token) => {
     });
 };
 
-// Function to get user application by user ID
-export const getUserApplication = async (userId, token) => {
-    const response = await axios.get(`${API_URL}/orders`, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
-    return response.data; 
+// Get user's application
+export const getUserApplication = async (token) => {
+    try {
+        const response = await axios.get(`${API_URL}/applications/user`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+};
+
+// Create application
+export const createApplication = async (formData, token) => {
+    try {
+        const response = await axios.post(`${API_URL}/applications`, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
 };
 
 // Generate QR Code for ID Card
@@ -58,6 +77,37 @@ export const getUserIdCard = async (userId, token) => {
     } catch (error) {
         console.error('Error fetching ID card:', error);
         throw error;
+    }
+};
+
+export const makePayment = async (applicationId, token) => {
+    try {
+        const response = await fetch(`${API_URL}/api/applications/${applicationId}/pay`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Get user's application history
+export const getUserApplicationHistory = async (token) => {
+    try {
+        const response = await axios.get(`${API_URL}/applications/history`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
     }
 };
 

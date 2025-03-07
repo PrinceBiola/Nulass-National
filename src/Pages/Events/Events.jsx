@@ -80,12 +80,12 @@ function Events() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Events Management</h1>
-          <button
+        <button
             onClick={() => setIsModalOpen(true)}
             className="mt-4 sm:mt-0 flex items-center gap-2 bg-customGreen text-white px-6 py-2.5 rounded-lg hover:bg-green-600 transition-all"
-          >
+        >
             <FaPlus /> Create Event
-          </button>
+        </button>
         </div>
 
         {/* Search and Filters */}
@@ -102,7 +102,7 @@ function Events() {
           </div>
           <div className="flex gap-2">
             {["all", "upcoming", "ended"].map((filter) => (
-              <button
+          <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
                 className={`px-4 py-2 rounded-lg capitalize ${
@@ -112,7 +112,7 @@ function Events() {
                 }`}
               >
                 {filter}
-              </button>
+          </button>
             ))}
           </div>
         </div>
@@ -140,7 +140,7 @@ function Events() {
                     {new Date(event.date) > new Date() ? 'Upcoming' : 'Ended'}
                   </span>
                 </div>
-              </div>
+      </div>
 
               {/* Event Details */}
               <div className="p-5">
@@ -190,7 +190,7 @@ function Events() {
                   </button>
                 </div>
               </div>
-            </div>
+              </div>
           ))}
         </div>
 

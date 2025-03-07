@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_URL = import.meta.env.VITE_SERVER_URL ;
+const API_URL = import.meta.env.VITE_SERVER_URL + '/api/payment';
 
 // Create axios instance with auth header
 const api = axios.create({
@@ -19,27 +19,30 @@ api.interceptors.request.use((config) => {
 });
 
 // Verify online payment
-export const verifyPayment = async ({ reference, applicationId }, token) => {
+export const verifyPayment = async (verificationData, token) => {
   try {
-    const response = await axios.post(`${API_URL}/api/payment/verify`, 
-      { reference, applicationId },
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      }
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const response = await axios.post(
+      `${API_URL}/verify`,
+      verificationData,
+      config
     );
     return response.data;
   } catch (error) {
-    throw error.response?.data || { message: 'Payment verification failed' };
+    throw error.response?.data || error.message;
   }
 };
 
 // Upload offline payment receipt
 export const uploadOfflinePayment = async (formData, token) => {
   try {
-    const response = await axios.post(`${API_URL}/api/payment/offline-payment`, 
+    const response = await axios.post(`${API_URL}/offline-payment`, 
       formData,
       {
         headers: {
@@ -56,7 +59,30 @@ export const uploadOfflinePayment = async (formData, token) => {
 // Get payment receipt
 export const getPaymentReceipt = async (applicationId) => {
   try {
-    const response = await api.get(`/api/payment/receipt/${applicationId}`);
+    const response = await api.get(`/receipt/${applicationId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+
+// Initialize payment
+export const initializePayment = async (paymentData, token) => {
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const response = await axios.post(
+      `${API_URL}/initialize`,
+      paymentData,
+      config
+    );
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;

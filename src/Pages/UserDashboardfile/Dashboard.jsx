@@ -241,13 +241,13 @@ function Dashboard() {
   const roleDisplay = getRoleDisplay();
 
   return (
-    <div className="space-y-6 p-6 bg-gray-50">
+    <div className="min-h-screen p-4 md:p-6 bg-gray-50">
       {/* Dashboard Header */}
-      <div className="flex items-center justify-between bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between bg-white p-4 md:p-6 rounded-xl shadow-sm mb-6">
+        <div className="flex items-center space-x-4 mb-4 md:mb-0">
           {roleDisplay.icon}
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">{roleDisplay.title}</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800">{roleDisplay.title}</h1>
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${roleDisplay.badge}`}>
               {user?.role?.replace('_', ' ').toUpperCase()}
             </span>
@@ -259,34 +259,28 @@ function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {(user?.role === 'admin' ?   adminStats :  user?.role === "superadmin" ?  SuperAdminStats : userStats).map((stat, index) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
+        {(user?.role === 'admin' ? adminStats : user?.role === "superadmin" ? SuperAdminStats : userStats).map((stat, index) => (
           <div
             key={index}
-            className="bg-white p-6 rounded-lg shadow-sm border border-gray-200"
+            className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between">
-              <div>
+              <div className="flex-1">
                 <p className="text-sm text-gray-500">{stat.title}</p>
-                <h3 className="text-2xl font-bold mt-1">{stat.value}</h3>
+                <h3 className="text-xl md:text-2xl font-bold mt-1">{stat.value}</h3>
               </div>
-              <div className={`p-3 rounded-full ${
-                stat.isIncrease ? 'bg-green-100' : 'bg-red-100'
-              }`}>
-                <stat.icon className={`w-6 h-6 ${
-                  stat.isIncrease ? 'text-green-600' : 'text-red-600'
-                }`} />
+              <div className={`p-3 rounded-full ${stat.isIncrease ? 'bg-green-100' : 'bg-red-100'}`}>
+                <stat.icon className={`w-5 h-5 md:w-6 md:h-6 ${stat.isIncrease ? 'text-green-600' : 'text-red-600'}`} />
               </div>
             </div>
             <div className="flex items-center mt-4">
               {stat.isIncrease ? (
-                <FaArrowUp className="w-4 h-4 text-green-500" />
+                <FaArrowUp className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
               ) : (
-                <FaArrowDown className="w-4 h-4 text-red-500" />
+                <FaArrowDown className="w-3 h-3 md:w-4 md:h-4 text-red-500" />
               )}
-              <span className={`ml-2 text-sm ${
-                stat.isIncrease ? 'text-green-500' : 'text-red-500'
-              }`}>
+              <span className={`ml-2 text-xs md:text-sm ${stat.isIncrease ? 'text-green-500' : 'text-red-500'}`}>
                 {stat.change} from last month
               </span>
             </div>
@@ -296,29 +290,33 @@ function Dashboard() {
 
       {/* Charts Section */}
       {user?.role === 'admin' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <h3 className="text-lg font-semibold mb-4">User Activity</h3>
-            <Line data={userActivityData} options={{
-              responsive: true,
-              plugins: {
-                legend: { position: 'bottom' },
-              }
-            }} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm">
+            <h3 className="text-base md:text-lg font-semibold mb-4">User Activity</h3>
+            <div className="h-[300px] md:h-[400px]">
+              <Line data={userActivityData} options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'bottom' },
+                }
+              }} />
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <h3 className="text-lg font-semibold mb-4">Revenue Overview</h3>
-            <Bar data={revenueData} options={{
-              responsive: true,
-              plugins: {
-                legend: { position: 'bottom' },
-              }
-            }} />
+          <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm">
+            <h3 className="text-base md:text-lg font-semibold mb-4">Revenue Overview</h3>
+            <div className="h-[300px] md:h-[400px]">
+              <Bar data={revenueData} options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'bottom' },
+                }
+              }} />
+            </div>
           </div>
         </div>
       )}
-
-      
     </div>
   );
 }

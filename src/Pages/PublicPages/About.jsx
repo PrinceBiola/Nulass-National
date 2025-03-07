@@ -1,14 +1,26 @@
 import React, { useState } from "react";
 import NavWrapper from "../../Components/NavWrapper";
-import { FaLinkedin, FaTwitter, FaEnvelope } from 'react-icons/fa';
+import { FaEnvelope, FaPhone, FaPhoneAlt, FaTimes } from 'react-icons/fa';
 import abiodun from '../../assets/Images/abiodun.jpg';
 import hamid from '../../assets/Images/hamid.jpg';
 import ajoke from '../../assets/Images/ajoke.jpg';
 import bambo from '../../assets/Images/Bambo.jpg';
 import { motion } from 'framer-motion';
+import adeoye from '../../assets/images/adeoye.jpg';
+import bada from '../../assets/images/bada.jpg';
+import lawal from '../../assets/images/lawal.jpg';
+import jamiu from '../../assets/Images/jamiu.jpg';
+import president from '../../assets/Images/hafiz.jpg';
+import isreal from '../../assets/images/isreal.jpg';
 
 export default function About() {
   const [activeTab, setActiveTab] = useState("values");
+  const [callModal, setCallModal] = useState({
+    isOpen: false,
+    name: '',
+    phone: '',
+    role: ''
+  });
 
   const renderContent = () => {
     switch (activeTab) {
@@ -96,48 +108,153 @@ export default function About() {
     }
   };
 
-  const leadershipTeam = [
-    {
-      name: "ABIODUN F. OLUSANYA",
-      role: "Assistant General Secretary",
-      image: abiodun,
-      socials: {
-        linkedin: "#",
-        twitter: "#",
-        email: "mailto:abiodun@nulass.org"
+    const leadershipTeam = [
+      {
+        name: 'Hafiz Olufowobi Remilekun',
+        role: 'President',
+        image: president,
+        socials: {
+          phone: "tel:+2349059675215",
+          email: "holypheelz@gmail.com"
+        }
+      },
+      {
+        name: 'Bada Azeez Akinola',
+        role: 'Nulass National Vice President I',
+        image: bada,
+        socials: {
+          phone: "tel:+2347015281578",
+          email: "azeezakinola3@gmail.com"
+        }
+      },
+      {
+        name: 'Nul. Comr. Lawal Oluwadarasimi Munir',
+        role: 'Nulass National Vice President II (Diaspora)',
+        image: lawal,
+        socials: {
+          phone: "tel:+2348156741355",
+          email: "darasimilawal86@gmail.com"
+        }
+      },
+      {
+        name: "Remilekun Bambo",
+        role: "General Secretary",
+        image: bambo,
+        socials: {
+          phone: "tel:+2347087937504",
+          email: "remlekbeauty2000@gmail.com"
+        }
+      },
+      {
+        name: "Abiodun F. Olusanya",
+        role: "Assistant General Secretary",
+        image: abiodun,
+        socials: {
+          phone: "tel:+2349067617290",
+          email: "olusanyaabiodun97@gmail.com"
+        }
+      },
+      {
+        name: 'Nul. Adeoye Taiwo Samuel',
+        role: 'Nulass National Pro1',
+        image: adeoye,
+        socials: {
+          phone: "tel:+2349066086623",
+          email: "adeoye@nulass.org"
+        }
+      },
+      {
+        name: 'Nul. Olatoye Jamiu Olarewaju',
+        role: 'Nulass National Pro (Diaspora)',
+        image: jamiu,
+        socials: {
+          phone: "tel:+2347017221722",
+          email: "jamiuolatoye08@gmail.com"
+        }
+      },
+      {
+        name: "Oyekunle Abdulhamid Opeyemi",
+        role: "Financial Secretary",
+        image: hamid,
+        socials: {
+          phone: "tel:+2348146966407",
+          email: "abdulhamidoyekunle@gmail.com"
+        }
+      },
+      {
+        name: "Ajoke Fatiah",
+        role: "Treasurer",
+        image: ajoke,
+        socials: {
+          phone: "tel:+2348087085265",
+          email: "ajoke@nulass.org"
+        }
+      },
+      {
+        name: "Awoyemi Israel Olamide",
+        role: "Welfare 1",
+        image: isreal,
+        socials: {
+          phone: "tel:+2347016424768",
+          email: "awoyemiisrael34@gmail.com"
+        }
       }
-    },
-    {
-      name: "Oyekunle Abdulhamid Opeyemi",
-      role: "Financial Secretary",
-      image: hamid,
-      socials: {
-        linkedin: "#",
-        twitter: "#",
-        email: "mailto:hamid@nulass.org"
-      }
-    },
-    {
-      name: "Ajoke Fatiah",
-      role: "Treasurer",
-      image: ajoke,
-      socials: {
-        linkedin: "#",
-        twitter: "#",
-        email: "mailto:ajoke@nulass.org"
-      }
-    },
-    {
-      name: "Remilekun Bambo",
-      role: "General Secretary",
-      image: bambo,
-      socials: {
-        linkedin: "#",
-        twitter: "#",
-        email: "mailto:bambo@nulass.org"
-      }
-    }
-  ];
+    ];
+
+  // Simplified call function
+  const handleCallClick = (phone) => {
+    window.location.href = phone; // phone already includes "tel:" prefix
+  };
+
+  // Add the modal component
+  const CallModal = () => {
+    if (!callModal.isOpen) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <motion.div 
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl"
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-gray-900">Calling...</h3>
+            <button 
+              onClick={() => setCallModal({ isOpen: false, name: '', phone: '', role: '' })}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <FaTimes size={24} />
+            </button>
+          </div>
+          
+          <div className="text-center mb-6">
+            <div className="w-20 h-20 bg-customGreen/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaPhone size={32} className="text-customGreen animate-pulse" />
+            </div>
+            <h4 className="text-lg font-semibold text-gray-900">{callModal.name}</h4>
+            <p className="text-customGreen font-medium text-sm mb-2">{callModal.role}</p>
+            <p className="text-gray-600">{callModal.phone}</p>
+          </div>
+          
+          <div className="flex gap-3">
+            <button
+              onClick={() => setCallModal({ isOpen: false, name: '', phone: '', role: '' })}
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <a
+              href={`tel:${callModal.phone}`}
+              className="flex-1 px-4 py-2 bg-customGreen text-white rounded-lg hover:bg-green-600 transition-colors text-center"
+            >
+              Call Again
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    );
+  };
 
   return (
     <NavWrapper>
@@ -215,7 +332,7 @@ export default function About() {
             <p className="text-lg text-gray-600">Meet the dedicated individuals leading NULASS National</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {leadershipTeam.map((leader, index) => (
               <motion.div
                 key={index}
@@ -223,34 +340,51 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-xl shadow-lg overflow-hidden group"
+                className="bg-white rounded-2xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-300"
               >
-                <div className="relative overflow-hidden h-64">
+                <div className="relative aspect-[3/4] overflow-hidden">
                   <img
                     src={leader.image}
                     alt={leader.name}
-                    className="w-full h-full object-cover object-center transform group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-4">
-                    <a href={leader.socials.linkedin} className="text-white hover:text-customGreen transition-colors">
-                      <FaLinkedin size={24} />
-                    </a>
-                    <a href={leader.socials.twitter} className="text-white hover:text-customGreen transition-colors">
-                      <FaTwitter size={24} />
-                    </a>
-                    <a href={leader.socials.email} className="text-white hover:text-customGreen transition-colors">
-                      <FaEnvelope size={24} />
-                    </a>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-6 group-hover:translate-y-0 transition-transform duration-300">
+                      <div className="flex justify-center space-x-4 mb-4">
+                        <a 
+                          href={leader.socials.phone}
+                          className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-customGreen hover:text-white transition-all duration-300 group"
+                          title={`Call ${leader.name}`}
+                        >
+                          <FaPhoneAlt 
+                            size={20} 
+                            className="transform -rotate-90 group-hover:rotate-0 transition-transform duration-300"
+                          />
+                        </a>
+                        <a 
+                          href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(leader.socials.email)}&su=${encodeURIComponent(`Message for ${leader.name} - NULASS National`)}`}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-customGreen hover:text-white transition-all duration-300"
+                          title={`Email ${leader.name}`}
+                        >
+                          <FaEnvelope size={20} />
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="p-6 text-center">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-1">{leader.name}</h3>
-                  <p className="text-customGreen font-medium">{leader.role}</p>
+                <div className="p-6 bg-white">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-2">{leader.name}</h3>
+                  <p className="text-customGreen font-medium text-sm">{leader.role}</p>
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
+
+        {/* Render the call modal */}
+        <CallModal />
       </div>
     </NavWrapper>
   );

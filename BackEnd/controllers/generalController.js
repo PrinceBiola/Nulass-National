@@ -266,29 +266,37 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Update the apply route to check for existing applications
+// Update the apply route to allow multiple applications
 router.post('/apply', protect, upload.single('image'), async (req, res) => {
     const { firstName, lastName, phoneNumber, NIN, institution, department, level, matricNumber, address, lgaOfOrigin, stateOfResidence } = req.body;
 
     try {
-        // Check for existing application for this user
-        const existingApplication = await Application.findOne({ user: req.user._id });
-        if (existingApplication) {
-            return res.status(409).json({ 
-                message: 'You have already submitted an application. Only one application per user is allowed.' 
-            });
-        }
-
         // Check if the file was uploaded
         if (!req.file) {
             return res.status(400).json({ message: 'Image file is required' });
+        }
+
+        // Get the latest application number for this user
+        const latestApp = await Application.findOne(
+            { user: req.user._id },
+            { applicationNumber: 1 }
+        ).sort({ applicationNumber: -1 });
+
+        // Ensure applicationNumber is a valid number
+        const nextApplicationNumber = (latestApp && typeof latestApp.applicationNumber === 'number') 
+            ? latestApp.applicationNumber + 1 
+            : 1;
+
+        // Validate that we have a valid number
+        if (isNaN(nextApplicationNumber)) {
+            throw new Error('Failed to generate valid application number');
         }
 
         const application = new Application({
             user: req.user._id,
             firstName,
             lastName,
-            email: req.user.email, // Use email from authenticated user
+            email: req.user.email,
             phoneNumber,
             NIN,
             institution,
@@ -299,13 +307,16 @@ router.post('/apply', protect, upload.single('image'), async (req, res) => {
             lgaOfOrigin,
             stateOfResidence,
             image: req.file.path,
+            applicationNumber: nextApplicationNumber,
+            status: 'under_review',
+            paymentStatus: 'unpaid'
         });
 
-        await application.save();
+        const savedApplication = await application.save();
 
         const order = new Order({
             user: req.user._id,
-            application: application._id,
+            application: savedApplication._id,
             paymentStatus: 'unpaid',
             reference: null,
         });
@@ -321,10 +332,13 @@ router.post('/apply', protect, upload.single('image'), async (req, res) => {
 
         res.status(201).json({ 
             message: 'Application submitted successfully! Please proceed with payment.', 
-            application 
+            application: savedApplication
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Application submission error:', error);
+        res.status(500).json({ 
+            message: error.message || 'Failed to submit application. Please try again.' 
+        });
     }
 });
 

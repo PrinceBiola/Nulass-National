@@ -48,17 +48,17 @@ function BlogManagement() {
     }
   }, [success, error]);
 
-  const loadPosts = async () => {
-    setLoading(true);
-    try {
-      const fetchedPosts = await fetchPosts();
-      setPosts(fetchedPosts);
-    } catch (error) {
-      setError("Failed to fetch posts.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadPosts = async () => {
+      setLoading(true);
+      try {
+        const fetchedPosts = await fetchPosts();
+        setPosts(fetchedPosts);
+      } catch (error) {
+        setError("Failed to fetch posts.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const handleDeleteClick = (post) => {
     setDeleteConfirmation({
@@ -257,7 +257,7 @@ function BlogManagement() {
                   >
                     <FiEdit2 size={18} />
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleDeleteClick(post)}
                     className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
                     title="Delete"

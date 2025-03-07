@@ -7,7 +7,6 @@ const UPLOAD_DIR = path.join(__dirname, '../../uploads');
 // Sub directories
 const DIRS = {
   events: path.join(UPLOAD_DIR, 'events'),
-  receipts: path.join(UPLOAD_DIR, 'receipts')
 };
 
 // Create directories if they don't exist

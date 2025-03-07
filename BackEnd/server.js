@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const applicationRoutes = require('./routes/applicationRoutes'); // Adjust the path as necessary
 const qrCodeRoutes = require('./routes/qrCodeRoutes');
 const { initializeUploadDirs, cleanupOldFiles } = require('./utils/fileUtils');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -23,7 +24,7 @@ app.use(bodyParser.json());
 app.use('/api', require('./controllers/generalController'));
 // app.use('/apis', require('./routes/general'));
 app.use('/api/auth', require('./controllers/authController'));
-app.use('/api/admin', require('./controllers/adminController'));
+app.use('/api/admin', adminRoutes);
 app.use('/api/payment', require('./routes/paymentRoutes'));
 app.use("/uploads", express.static("./uploads"));
 app.use('/api/applications', applicationRoutes);
