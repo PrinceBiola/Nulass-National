@@ -54,6 +54,12 @@ import Insti_Analytics from "./Pages/Analytics/Insti_Analytics";
 // Commented out for future use
 // import InstiEvent from "./Pages/InstiEvent/InstiEvent";
 
+// Super Admin Components
+// import UserManagement from './Pages/SuperAdmin/UserManagement';
+// import FinancialsManagement from './Pages/SuperAdmin/FinancialsManagement';
+// import ExecutiveManagement from './Pages/SuperAdmin/ExecutiveManagement';
+// import SystemSettings from './Pages/SuperAdmin/SystemSettings';
+
 function App() {
   return (
     <MantineProvider>
@@ -108,6 +114,18 @@ function App() {
                 <Route path="finance" element={<Insti_Finance />} />
                 <Route path="analytics" element={<Insti_Analytics />} />
               </Route>
+
+              {/* Super Admin Routes */}
+              {/* <Route element={<SuperAdminRoute />}>
+                <Route path="/dashboard/user-management" element={<UserManagement />} />
+                <Route path="/dashboard/executive-management" element={<ExecutiveManagement />} />
+                <Route path="/dashboard/settings" element={<SystemSettings />} />
+              </Route>
+
+              {/* Admin Routes (accessible by both admin and superadmin) 
+              <Route element={<AdminRoute />}>
+                <Route path="/dashboard/financials" element={<FinancialsManagement />} />
+              </Route> */}
             </Route>
           </Routes>
         </BrowserRouter>
