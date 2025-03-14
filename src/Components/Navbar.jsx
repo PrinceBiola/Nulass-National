@@ -38,6 +38,7 @@ function Navbar() {
               <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full">
                 <span className="text-sm font-medium text-white">JD</span>
               </div>
+              
             </div>
           </div>
         </div>

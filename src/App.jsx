@@ -54,6 +54,9 @@ import Insti_Analytics from "./Pages/Analytics/Insti_Analytics";
 // Commented out for future use
 // import InstiEvent from "./Pages/InstiEvent/InstiEvent";
 
+import PaymentSuccess from "./Pages/Payment/PaymentSuccess";
+import PaymentVerification from "./Pages/Payment/PaymentVerification";
+
 function App() {
   return (
     <MantineProvider>
@@ -68,6 +71,8 @@ function App() {
             <Route path="/blog/:id" element={<BlogDetails />} />
             <Route path="/course" element={<Course />} />
             <Route path="/events" element={<PublicEvents />} />
+            <Route path="payment/verify" element={<PaymentVerification />} />
+            <Route path="payment/success" element={<PaymentSuccess />} />
 
             {/* Auth Routes */}
             <Route path="/login" element={<Login />} />
@@ -84,6 +89,8 @@ function App() {
                 <Route path="application" element={<Application />} />
                 <Route path="id-card" element={<IdCard />} />
                 <Route path="user-order" element={<UserOrder />} />
+                <Route path="payment/verify" element={<PaymentVerification />} />
+                <Route path="payment/success" element={<PaymentSuccess />} />
               </Route>
 
               {/* Admin Dashboard Routes */}

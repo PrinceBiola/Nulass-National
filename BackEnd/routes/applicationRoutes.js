@@ -12,7 +12,11 @@ const {
   deleteApplication,
   updateApplicationStatus,
   verifyPayment,
-  getUserApplicationHistory
+  getUserApplicationHistory,
+  initializePayment,
+  generateMemberCard,
+  verifyPaymentCallback,
+  getMembershipStatus
 } = require('../controllers/applicationController');
 
 // Application routes
@@ -22,7 +26,16 @@ router.get('/', protect, getApplications);
 router.put('/:id', protect, updateApplication);
 router.delete('/:id', protect, deleteApplication);
 router.put('/:id/status', protect, updateApplicationStatus);
-router.post('/:id/verify-payment', protect, verifyPayment);
+// router.post('/:id/verify-payment', protect, verifyPayment);
 router.get('/history', protect, getUserApplicationHistory);
+
+// Add new payment routes
+router.post('/initialize-payment', protect, initializePayment);
+router.get('/verify-payment', verifyPayment);
+
+// Membership card routes
+router.get('/:id/card', protect, generateMemberCard);
+router.get('/membership-status', protect, getMembershipStatus);
+router.post('/verify-callback', verifyPaymentCallback);
 
 module.exports = router; 

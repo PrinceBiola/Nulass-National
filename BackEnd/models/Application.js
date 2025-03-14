@@ -23,7 +23,7 @@ const applicationSchema = new mongoose.Schema({
   stateOfResidence: { type: String, required: true },
   status: {
     type: String,
-    enum: ['pending', 'under_review', 'approved', 'rejected', 'payment_pending', 'completed'],
+    enum: ['pending', 'under_review', 'approved', 'rejected', 'payment_initiated', 'payment_pending', 'completed'],
     default: 'under_review'
   },
   rejectionReason: {

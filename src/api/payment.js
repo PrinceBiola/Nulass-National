@@ -1,5 +1,6 @@
 import axios from 'axios';
-const API_URL = import.meta.env.VITE_SERVER_URL + '/api/payment';
+const API_URL = import.meta.env.VITE_SERVER_URL + '/api/applications';
+const URL = import.meta.env.VITE_SERVER_URL + '/api/payment';
 
 // Create axios instance with auth header
 const api = axios.create({
@@ -21,21 +22,24 @@ api.interceptors.request.use((config) => {
 // Verify online payment
 export const verifyPayment = async (verificationData, token) => {
   try {
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
+    console.log('Verifying payment with data:', verificationData);
+    
     const response = await axios.post(
-      `${API_URL}/verify`,
+      `${URL}/verify-payment`,
       verificationData,
-      config
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
+    
+    console.log('Verification response:', response.data);
     return response.data;
   } catch (error) {
-    throw error.response?.data || error.message;
+    console.error('Verification error:', error.response?.data || error.message);
+    throw error.response?.data || error;
   }
 };
 
@@ -82,6 +86,81 @@ export const initializePayment = async (paymentData, token) => {
       `${API_URL}/initialize`,
       paymentData,
       config
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const initiatePayment = async (applicationId, token) => {
+  try {
+    console.log('Initiating payment for application:', applicationId);
+    
+    const response = await axios.post(
+      `${API_URL}/initialize-payment`,
+      { applicationId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    
+    console.log('Payment initialization response:', response.data);
+
+    if (response.data.data && response.data.data.authorization_url) {
+      window.location.href = response.data.data.authorization_url;
+      return response.data;
+    } else {
+      throw new Error('Invalid payment response');
+    }
+  } catch (error) {
+    console.error('Payment Error:', error.response?.data || error);
+    throw {
+      message: error.response?.data?.message || 'Payment initialization failed',
+      details: error.response?.data?.details || error.message
+    };
+  }
+};
+
+export const getPaymentStatus = async (reference, token) => {
+  try {
+    const response = await axios.get(`${API_URL}/status/${reference}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to get payment status' };
+  }
+};
+
+export const getUserApplication = async (token) => {
+  try {
+    const response = await axios.get(`${API_URL}/applications/user`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const downloadMembershipCard = async (applicationId, token) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/applications/${applicationId}/card`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      }
     );
     return response.data;
   } catch (error) {
