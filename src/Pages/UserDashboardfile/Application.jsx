@@ -22,7 +22,7 @@ const Application = () => {
     try {
       const data = await getUserApplicationHistory(user.token);
       setApplications(data);
-    } catch (error) {
+      } catch (error) {
       console.error('Error fetching applications:', error);
       toast.error('Failed to fetch applications');
     } finally {
@@ -57,7 +57,7 @@ const Application = () => {
     <div className="p-6 max-w-4xl mx-auto">
       {/* Show application history if exists */}
       {applications.length > 0 && (
-        <div className="mb-8">
+          <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-6">Application History</h2>
           <div className="space-y-4">
             {applications.map((app) => (
@@ -67,7 +67,7 @@ const Application = () => {
                     <p className="text-sm text-gray-600">Application #{app.applicationNumber}</p>
                     <h3 className="text-lg font-semibold mt-1">{app.firstName} {app.lastName}</h3>
                     <p className="text-sm text-gray-500">{new Date(app.createdAt).toLocaleDateString()}</p>
-                  </div>
+                </div>
                   <div className="text-right">
                     <span className={`px-3 py-1 rounded-full text-sm font-medium
                       ${app.status === 'under_review' ? 'bg-yellow-100 text-yellow-800' :
@@ -78,7 +78,7 @@ const Application = () => {
                         'bg-gray-100 text-gray-800'}`}>
                       {app.status.replace('_', ' ').toUpperCase()}
                     </span>
-                  </div>
+              </div>
                 </div>
 
                 {app.rejectionReason && (
@@ -86,7 +86,7 @@ const Application = () => {
                     <p className="text-red-700 text-sm">
                       <span className="font-medium">Rejection Reason:</span> {app.rejectionReason}
                     </p>
-                  </div>
+              </div>
                 )}
 
                 {app.status === 'payment_pending' && (
@@ -97,34 +97,34 @@ const Application = () => {
                     >
                       Proceed to Payment
                     </button>
-                  </div>
+              </div>
                 )}
               </div>
             ))}
           </div>
-        </div>
-      )}
+                          </div>
+                        )}
 
       {/* Show application form if no active application or last one was rejected */}
       {(!applications.length || applications[0]?.status === 'rejected') && (
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-2xl font-semibold mb-6">Submit Application</h2>
           <ApplicationForm onSuccess={fetchApplications} />
-        </div>
+                  </div>
       )}
 
       {/* Payment Modal */}
       {showPaymentModal && selectedApplication && (
-        <PaymentModal
-          isOpen={showPaymentModal}
+                <PaymentModal
+                  isOpen={showPaymentModal}
           onClose={() => {
             setShowPaymentModal(false);
             setSelectedApplication(null);
           }}
           applicationData={selectedApplication}
-          onPaymentSuccess={handlePaymentSuccess}
-        />
-      )}
+                  onPaymentSuccess={handlePaymentSuccess}
+                />
+              )}
     </div>
   );
 };
